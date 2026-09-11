@@ -3,12 +3,15 @@
 | Date       | Summary of Changes |
 | ---------- | ------------------ |
 | 2026-09-11 | Initialized the new-machine reproduction record. |
+| 2026-09-12 | Reviewed evidence, corrected completion status, and linked final artifacts. |
 
 # Progress
 
+Status: `completed`.
+
 ### 2026-09-11
 
-- Status: `in-progress`.
+- Status: `completed`.
 - Completed: read canonical task recipe and mandatory StepMind runbook; confirmed current host and local disk capacity; identified all required persistent assets as missing locally.
 - Completed: copied the fixed video, VideoAgent model bundle, three Python environments, HF inventory, HF cache, and a restricted StepCode config from `shai-ycfeng`; verified the video SHA-256 (`db2bb94ff43ccb040fe5fd117e19e6f907e9065d74ec7276596a9c8ba4d554af`) matches the source, and matched runtime/cache file counts except for one benign local metadata file.
 - Completed: verified `tests/e2e/submit_tvcache_reproduction_rjob.py` with `py_compile`, verified the worker shell script with `bash -n`, and queried personal-auth capacity showing available H800 nodes in `codesign`.
@@ -20,6 +23,8 @@
 - Copied two previously missing remote assets from `shai-ycfeng`: `/data/ycfeng/tmp/h800-range.part` (9,976,576,392 bytes) and `/data/ycfeng/tmp/video-tower-mirror.bin` (2,114,828,105 bytes), plus the symlink target directory `/data/ycfeng/tmp/videoagent_small_clean` (6,781,002,101 bytes).
 - Tool smoke passed all six operations with HTTP 200; four rollouts completed and produced the expected JSON/JSONL artifacts.
 - Acceptance evidence: all rewards `1.0`, final answers `1`, non-empty tool calls, provider token totals, no-cache stats `18/13` misses, TVCache stats `tvcache-0` `10` prefix hits + `1` miss and `tvcache-1` `6` exact + `10` prefix hits, `remaining_run_sandboxes=[]`.
+- Final artifact paths: [tool smoke](/data/ycfeng/step-sandbox/TVCache/.worktrees/tvcache-rl-reproduction/task_memory/task_2026-08-14_tvcache_rl_rollout_reproduction/exp-0911-180851-903367-tool-smoke.json), [rollouts](/data/ycfeng/step-sandbox/TVCache/.worktrees/tvcache-rl-reproduction/task_memory/task_2026-08-14_tvcache_rl_rollout_reproduction/exp-0911-180851-903367-rollouts), and worker evidence under `/data/ycfeng/tmp/exp-0911-180851-903367/`.
+- Reviewed and resolved two additional asset gaps during execution: `/data/ycfeng/tmp/videoagent_small_clean` and `/data/ycfeng/tmp/video-tower-mirror.bin`.
 
 ### Transfer and preflight evidence
 
