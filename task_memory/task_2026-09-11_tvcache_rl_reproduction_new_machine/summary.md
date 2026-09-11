@@ -1,0 +1,24 @@
+## Modification History
+
+| Date | Summary of Changes |
+| --- | --- |
+| 2026-09-11 | Archived the completed new-machine TVCache rollout reproduction. |
+
+# Task Overview
+
+Reproduced the canonical EgoSchema VideoAgent TVCache E2E workflow on `kun-workspace-vgen2` using a local personal-authenticated StepMind RJobBackend H800 worker.
+
+# Deliverables Inventory
+
+- [submit_tvcache_reproduction_rjob.py](/data/ycfeng/step-sandbox/TVCache/.worktrees/tvcache-rl-reproduction/tests/e2e/submit_tvcache_reproduction_rjob.py)
+- [run_real_video_rollouts_h800.sh](/data/ycfeng/step-sandbox/TVCache/.worktrees/tvcache-rl-reproduction/tests/e2e/run_real_video_rollouts_h800.sh)
+- E2E outputs: `task_memory/task_2026-08-14_tvcache_rl_rollout_reproduction/exp-0911-180851-903367-*`
+- Validation report: `test_report_2026-09-11_new_machine_e2e.md`
+
+# Validation Status
+
+RJob `exp-0911-180851-903367` succeeded. Four rollouts completed with reward 1.0 and final answer index 1. TVCache recorded six exact hits and twenty prefix hits across the two TVCache variants; no sandbox remained active.
+
+# Open Items/Future Extensions
+
+None for the requested reproduction.
