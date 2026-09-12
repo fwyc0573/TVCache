@@ -2,6 +2,6 @@
 set -euo pipefail
 
 export CUDA_VISIBLE_DEVICES=0
-export OPENAI_API_KEY=your_key
 
-python3 sandbox_server.py
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+exec python3 "$SCRIPT_DIR/sandbox_server.py"

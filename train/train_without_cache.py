@@ -1,6 +1,7 @@
 import logging
-import time
 import asyncio
+import os
+import time
 from tool_schema import Response
 import chz
 import datasets
@@ -9,10 +10,15 @@ import torch
 from tinker import types
 from tinker.types.tensor_data import TensorData
 from tinker_cookbook import checkpoint_utils, model_info, renderers
+from tinker_cookbook.rl.data_processing import trajectory_to_data
 from tinker_cookbook.tokenizer_utils import get_tokenizer
 from tinker_cookbook.utils import ml_log
 import json
 from agent_loop import VideoAgentLoop
+from utils.dataset_selection import select_dataset_slice
+from utils.rollout_execution import run_agent_loops
+from utils.rollout_metrics import build_rollout_record, write_rollout_records
+from utils.training_update import apply_training_update
 import random
 
 from typing import List, Dict
@@ -25,7 +31,8 @@ random.seed(8)
 class Config:
     base_url: str | None = None
     log_path: str = "./tests/rebuttal_nocache"
-    model_name: str = "Qwen/Qwen3-30B-A3B-Instruct-2507"
+    model_name: str = "Qwen/Qwen3.6-35B-A3B"
+    renderer_name: str = "qwen3_disable_thinking"
     batch_size: int = 4
     group_size: int = 8
     learning_rate: float = 4e-5
@@ -35,6 +42,8 @@ class Config:
     max_tokens: int = 1024
     num_turns: int = 5
     sandbox_base_url: str = "http://localhost:5000"
+    dataset_start: int = 0
+    dataset_count: int = 100
     epochs: int = 10
 
 
@@ -55,18 +64,25 @@ def get_prompt(question: str, options: Dict[str, str], video_id: str) -> str:
         prompt = prompt.replace('{response_schema}', json.dumps(Response.model_json_schema(), indent='\t'))
         return prompt
 
-def get_video_dataset() -> List[dict]:
+def get_video_dataset(dataset_start: int, dataset_count: int) -> List[dict]:
     json_path = './EgoSchema/processed_videos.json'
 
     dataset = []
 
     with open(json_path, 'r') as json_file:
         data = json.load(json_file)
-        for point in data:
+        for dataset_index, point in enumerate(data):
             question_prompt = get_prompt(point['question'], point['options'], point['video_id'])
-            dataset.append({"question": question_prompt, "answer": point["correct_answer_index"]})
+            dataset.append(
+                {
+                    "question": question_prompt,
+                    "answer": point["correct_answer_index"],
+                    "dataset_index": dataset_index,
+                    "video_id": point["video_id"],
+                }
+            )
     
-    return dataset[: 100]
+    return select_dataset_slice(dataset, dataset_start, dataset_count)
 
 def get_task_id(question: str) -> str:
     lines = question.splitlines()
@@ -78,6 +94,9 @@ def get_task_id(question: str) -> str:
 
 
 async def main(config: Config):
+    rollout_log_dir = os.path.join(config.log_path, "rollouts")
+    run_id = f"no_cache_{time.time_ns()}"
+
     # Setup logging
     ml_logger = ml_log.setup_logging(
         log_dir=config.log_path,
@@ -89,13 +108,12 @@ async def main(config: Config):
 
     # Get tokenizer and renderer
     tokenizer = get_tokenizer(config.model_name)
-    renderer_name = model_info.get_recommended_renderer_name(config.model_name)
-    renderer = renderers.get_renderer(renderer_name, tokenizer)
-    logger.info(f"Using renderer: {renderer_name}")
+    renderer = renderers.get_renderer(config.renderer_name, tokenizer)
+    logger.info(f"Using renderer: {config.renderer_name}")
 
     # Load GSM8K dataset
     logger.info("Loading dataset...")
-    dataset = get_video_dataset()
+    dataset = get_video_dataset(config.dataset_start, config.dataset_count)
 
     
     train_dataset = []
@@ -168,8 +186,10 @@ async def main(config: Config):
         training_datums: list[types.Datum] = []
         batch_rewards: list[float] = []
         batch_reward_lists: List[List[float]] = []
+        batch_rollout_elapsed_seconds: list[float] = []
 
         rollout_groups: List[List[VideoAgentLoop]] = []
+        sandbox_ids: List[str] = []
 
         if next_batch_idx < n_train_batches:
             next_batch_start = next_batch_idx * config.batch_size
@@ -190,42 +210,56 @@ async def main(config: Config):
                     num_turns=config.num_turns,
                     renderer=renderer,
                     sandbox_base_url=config.sandbox_base_url,
+                    rollout_log_dir=rollout_log_dir,
                     task_id=get_task_id(data['question'])
                 )
 
                 # Start sandbox with unique ID
-                sandbox_id = f"batch_{batch_idx}_data_{batch_rows.index(data)}_rollout_{i}"
-                await agent_loop.start_sandbox(sandbox_id)
+                sandbox_id = f"{run_id}_batch_{batch_idx}_data_{batch_rows.index(data)}_rollout_{i}"
                 agent_loops.append(agent_loop)
+                sandbox_ids.append(sandbox_id)
             
             rollout_groups.append(agent_loops)
         
-        tasks = []
-
-        for agent_loop_list in rollout_groups:
-            for agent_loop in agent_loop_list:
-                tasks.append(agent_loop.run(sampling_params=sampling_params))
-
-        results = await asyncio.gather(*tasks)
+        flat_agent_loops = [
+            agent_loop
+            for agent_loop_list in rollout_groups
+            for agent_loop in agent_loop_list
+        ]
+        results = await run_agent_loops(
+            flat_agent_loops,
+            sandbox_ids,
+            sampling_params=sampling_params,
+        )
         result_index = 0
 
         batch_agent_results = []
+        batch_rollout_records = []
 
         for data_idx, data in enumerate(batch_rows):
             data_agent_loops = rollout_groups[data_idx]
             data_agent_loop_results = []
 
-            for _ in range(config.group_size):
-                data_agent_loop_results.append(results[result_index])
+            for rollout_index in range(config.group_size):
+                agent_loop = data_agent_loops[rollout_index]
+                rollout_result = results[result_index]
+                sandbox_id = sandbox_ids[result_index]
+                data_agent_loop_results.append(rollout_result)
+                batch_rollout_records.append(
+                    build_rollout_record(
+                        variant="no_cache",
+                        batch_index=batch_idx,
+                        dataset_index=data["dataset_index"],
+                        rollout_index=rollout_index,
+                        sandbox_id=sandbox_id,
+                        video_id=data["video_id"],
+                        agent_loop=agent_loop,
+                        execution_result=rollout_result,
+                    )
+                )
                 result_index += 1
 
             assert len(data_agent_loops) == len(data_agent_loop_results)
-
-            for agent_loop_obj in data_agent_loops:
-                try:
-                    await agent_loop_obj.stop_sandbox()
-                except Exception as e:
-                    print(f'Failed to stop agent loop sandbox')
             
             batch_agent_results.append(
                 {
@@ -234,6 +268,7 @@ async def main(config: Config):
                     'results': data_agent_loop_results
                 }
             )
+        write_rollout_records(config.log_path, batch_rollout_records)
         
         # Process each group of rollouts
         for item in batch_agent_results:
@@ -242,15 +277,15 @@ async def main(config: Config):
             rollout_results = item['results']
 
             group_rewards: list[float] = []
-            group_tokens: list[list[int]] = []
-            group_logprobs: list[list[float]] = []
-            group_advantage_masks: list[list[float]] = []
+            group_trajectories = []
 
-            for agent_loop, (all_tokens, all_logprobs, advantage_mask) in zip(agent_loops, rollout_results):
+            for agent_loop, rollout_result in zip(agent_loops, rollout_results):
+                trajectory = rollout_result.output
+                batch_rollout_elapsed_seconds.append(
+                    rollout_result.elapsed_seconds
+                )
 
-                group_tokens.append(all_tokens)
-                group_logprobs.append(all_logprobs)
-                group_advantage_masks.append(advantage_mask)
+                group_trajectories.append(trajectory)
 
                 reward = agent_loop.get_reward()
                 group_rewards.append(reward)
@@ -265,49 +300,31 @@ async def main(config: Config):
             if all(advantage == 0.0 for advantage in advantages):
                 continue
 
-            for tokens, logprobs, advantage_mask, advantage in zip(
-                group_tokens, group_logprobs, group_advantage_masks, advantages
+            for trajectory, advantage in zip(
+                group_trajectories,
+                advantages,
             ):
-                input_tokens = tokens[:-1]
-                input_tokens = [int(token) for token in input_tokens]
-                target_tokens = tokens[1:]
-
-                # Apply advantage to masked positions
-                all_advantages = [mask * advantage for mask in advantage_mask]
-
-                assert (
-                    len(input_tokens)
-                    == len(target_tokens)
-                    == len(logprobs)
-                    == len(all_advantages)
-                ), (
-                    f"len(input_tokens): {len(input_tokens)}, len(target_tokens): {len(target_tokens)}, "
-                    f"len(logprobs): {len(logprobs)}, len(all_advantages): {len(all_advantages)}"
+                training_datums.extend(
+                    trajectory_to_data(trajectory, advantage)
                 )
 
-                datum = types.Datum(
-                    model_input=types.ModelInput.from_ints(tokens=input_tokens),
-                    loss_fn_inputs={
-                        "target_tokens": TensorData.from_torch(torch.tensor(target_tokens)),
-                        "logprobs": TensorData.from_torch(torch.tensor(logprobs)),
-                        "advantages": TensorData.from_torch(torch.tensor(all_advantages)),
-                    },
-                )
-                training_datums.append(datum)
-
-        # Training step
-        fwd_bwd_future = await training_client.forward_backward_async(
-            training_datums, loss_fn="importance_sampling"
+        await apply_training_update(
+            training_client=training_client,
+            training_datums=training_datums,
+            adam_params=adam_params,
+            metrics=metrics,
         )
-        optim_step_future = await training_client.optim_step_async(adam_params)
-
-        _fwd_bwd_result = await fwd_bwd_future
-        _optim_result = await optim_step_future
 
         # Log metrics[]
         metrics["time/total"] = time.time() - t_start
         metrics["reward/average"] = sum(batch_rewards) / len(batch_rewards)
         metrics["reward/list"] = batch_reward_lists 
+        metrics["rollout/elapsed_seconds_total"] = sum(
+            batch_rollout_elapsed_seconds
+        )
+        metrics["rollout/elapsed_seconds_average"] = sum(
+            batch_rollout_elapsed_seconds
+        ) / len(batch_rollout_elapsed_seconds)
         ml_logger.log_metrics(metrics, step=batch_idx)
 
         batch_idx = next_batch_idx

@@ -1,0 +1,297 @@
+{
+  "variant": "no-cache",
+  "rollout_index": 0,
+  "video_id": "0c481667-9303-4f4a-b331-0b412aaafa2d",
+  "sandbox_id": "provider-94acc34940b1437ea49aa0e37d3b3f2f-no-cache-0c481667-9303-4f4a-b331-0b412aaafa2d-0",
+  "started_at_unix": 1789120381.601168,
+  "finished_at_unix": 1789120697.1312273,
+  "model": "deepseek-v4-flash",
+  "elapsed_seconds": 315.08797970600426,
+  "final_answer": 1,
+  "reward": 1.0,
+  "messages": [
+    {
+      "role": "user",
+      "content": "You are an AI assistant tasked with answering a multiple-choice question related to a video. You will be given a task instruction and the output from previously executed tools. Your goal is to answer the questions by providing batches of tool calls. The question has 5 choices, labeled as 0, 1, 2, 3, 4. The video is sliced into 2-second segments, each with a segment ID starting from zero and incrementing in chronological order. Each segment has a caption depicting the event. There is an object memory that saves the objects and their appearing segments. The object memory is maintained by another agent.\n\nYou have access to the following tools:\n\n1. load_video_into_sandbox(video_name): Load the video video_name into a sandbox for processing. This must be called before any other video processing operations.\n\n2. preprocess(): Preprocess the video in the sandbox by building temporal memory (captions and segment embeddings) and object memory (tracking and re-identification). This must be called after loading a video and before querying or analyzing it.\n\n3. object_memory_querying(question): Given a question about open-vocabulary objects such as \"how many people are there in the video?\" or \"In which segments did the brown dog appear?\", this tool will give the answer based on the object memory. The tool uses sub-tools including database querying and open-vocabulary object retrieval.\n\n4. segment_localization(description): Given a textual description, this tool will return the top-5 candidate segments that are most relevant to the description. Use this to find when specific events or actions occur in the video.\n\n5. caption_retrieval(start_segment_ID, end_segment_ID): Given an input tuple (start_segment_ID, end_segment_ID), this tool will retrieve all the captions between the two segments, 15 captions at most. end_segment_ID < start_segment_ID + 15. Use this to get detailed descriptions of what happens in a time range. \n\n6. visual_question_answering(question, segment_ID): Given an input tuple (question, segment_ID), this tool will focus on the video segments starting from segment_ID-1 to segment_ID+1. It will return the description of the video segment and the answer to the question based on the segment. \n\nCRITICAL:\nYou cannot proceed with other tools (object_memory_querying, segment_localization, caption_retrieval, visual_question_answering) WITHOUT loading the video first and then preprocessing the video. What this means is that you need to always first load the video and next preprocess it. Only after this completes and you observe it is complete, you can proceed calling other tools. \n\nATTENTION:\n1. The segment captions with prefix '#C' refer to the camera wearer, while those with prefix '#O' refer to someone other than the camera wearer.\n2. You can use both 'visual_question_answering' and 'object_memory_querying' to answer questions related to objects or people.\n3. The 'visual_question_answering' may have hallucination. You should pay more attention to the description rather than the answer in 'visual_question_answering'.\n4. Use single quotes on the string arguments of the tools. The input to the tools should not contain any double quotes. If the tool has two arguments, output the arguments in brackets such as ('what is the man doing', 1).\n5. Its easier to answer the multiple-choice question by validating the choices.\n6. If the information is too vague to provide an accurate answer, make your best guess.\n7. Use segment_localization to quickly find relevant parts of the video before using caption_retrieval or visual_question_answering for details.\n8. For questions about specific objects or people across the entire video, use object_memory_querying first.\n\nQuestion: In the context of this video, what would you consider to be the critical moments or turning points that demonstrated the artist's proficiency and thought process? explain your reasoning.\n\nOptions:\n0: The critical moments or turning points in the video were when the artist started painting and when the artist finished painting. these moments were important because they marked the beginning and end of the creative process.\n1: The critical moments or turning points in the video were when the artist switched from using a paintbrush to using a color pen. this change in tools allowed the artist to add more detail and color to the painting.\n2: The critical moments or turning points in the video were when the artist added details to the painting and when the artist removed details from the painting. these moments were important because they showed how the artist's vision for the painting evolved over time.\n3: The critical moments or turning points in the video were when the artist used a light touch and when the artist used a heavy touch. these moments were important because they showed how the artist controlled the flow of paint and ink.\n4: The critical moments or turning points in the video were when the artist used a warm color palette and when the artist used a cool color palette. these moments were important because they showed how the artist used color to create a mood or atmosphere.\n\nYour response must be a JSON object that matches this schema. Do not include markdown formatting in your response.\n\n{\"$defs\": {\"Action\": {\"additionalProperties\": false, \"properties\": {\"tool\": {\"description\": \"The name of the tool to invoke. Must be one of: 'load_video_into_sandbox', 'preprocess', 'object_memory_querying', 'segment_localization', 'caption_retrieval', 'visual_question_answering'. CRITICAL: Always call 'load_video_into_sandbox' first, then 'preprocess' before using any other tools.\", \"title\": \"Tool\", \"type\": \"string\"}, \"inputs\": {\"description\": \"The inputs to the tool. Format depends on the tool:\\n- load_video_into_sandbox: string video_name, e.g., 'video.mp4'\\n- preprocess: no arguments needed (empty string)\\n- object_memory_querying: string question, e.g., 'how many people are there?'\\n- segment_localization: string description, e.g., 'person opening a door'\\n- caption_retrieval: tuple (start_segment_ID, end_segment_ID), e.g., (0, 10)\\n- visual_question_answering: tuple (question, segment_ID), e.g., ('what is the person doing', 5)\\n\\nCRITICAL: IMPORTANT FORMATTING RULES FOR TUPLES:\\n- If the input is a tuple, put the tuple inside the string using the following format:\\n- Tuples must use the format (arg1, arg2)\\n- String elements inside tuples MUST always use single quotes ('), never double quotes (\\\")\\n- Examples: ('what is the person doing', 5), ('describe the scene', 3), ('is there a car', 0)\\n- Incorrect: (\\\"what is the person doing\\\", 5) - DO NOT use double quotes inside tuples\", \"title\": \"Inputs\", \"type\": \"string\"}}, \"required\": [\"tool\", \"inputs\"], \"title\": \"Action\", \"type\": \"object\"}}, \"additionalProperties\": false, \"properties\": {\"thought\": {\"description\": \"Your reasoning about what to do next. Think step-by-step about: (1) what information you need, (2) which tools to use, (3) how the results will help answer the question. If you have enough information to answer, explain your reasoning for selecting the final answer. Remember to first load and preprocess the video before using analysis tools.\", \"title\": \"Thought\", \"type\": \"string\"}, \"actions\": {\"description\": \"List of tool actions to execute in this batch. Can include multiple tools to be called in sequence or parallel. IMPORTANT: If you are providing a final_answer, this list MUST be empty. Only populate this when you need to execute more tools.\", \"items\": {\"$ref\": \"#/$defs/Action\"}, \"title\": \"Actions\", \"type\": \"array\"}, \"final_answer\": {\"anyOf\": [{\"type\": \"integer\"}, {\"type\": \"null\"}], \"default\": null, \"description\": \"The final answer to the multiple-choice question. Must be one of: 0, 1, 2, 3, or 4. CRITICAL: Only provide this (not null) when you have gathered enough information AND the actions list is EMPTY. If you need to execute more tools, leave this as null and populate the actions list instead. You cannot have both actions to execute AND a final answer in the same response.\", \"title\": \"Final Answer\"}}, \"required\": [\"thought\"], \"title\": \"Response\", \"type\": \"object\"}\n\nThe associated video name is 0c481667-9303-4f4a-b331-0b412aaafa2d.mp4."
+    },
+    {
+      "role": "assistant",
+      "content": "{\"thought\":\"We need to analyze the video to determine the critical moments or turning points that show the artist's proficiency and thought process. First, I must load the video into the sandbox and preprocess it before using any analysis tools.\",\"actions\":[{\"tool\":\"load_video_into_sandbox\",\"inputs\":\"0c481667-9303-4f4a-b331-0b412aaafa2d.mp4\"},{\"tool\":\"preprocess\",\"inputs\":\"\"}],\"final_answer\":null}"
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for load_video_into_sandbox: Successfully loaded video into the sandbox"
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for preprocess: Preprocessing completed"
+    },
+    {
+      "role": "assistant",
+      "content": "{\"thought\":\"I need to find the critical moments in the video that show the artist's process. I'll use segment_localization to find relevant segments about painting, tool usage, and techniques. This will help validate the options.\",\"actions\":[{\"tool\":\"segment_localization\",\"inputs\":\"artist painting\"},{\"tool\":\"segment_localization\",\"inputs\":\"artist using paintbrush\"},{\"tool\":\"segment_localization\",\"inputs\":\"artist using color pen\"},{\"tool\":\"segment_localization\",\"inputs\":\"artist adding details\"},{\"tool\":\"segment_localization\",\"inputs\":\"artist removing details\"},{\"tool\":\"segment_localization\",\"inputs\":\"artist using light touch\"},{\"tool\":\"segment_localization\",\"inputs\":\"artist using heavy touch\"},{\"tool\":\"segment_localization\",\"inputs\":\"artist using warm colors\"},{\"tool\":\"segment_localization\",\"inputs\":\"artist using cool colors\"}],\"final_answer\":null}"
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for segment_localization: \nThere are 90 segments in total, ranging from 0 to 89. The most relevant segments are: {4: '#C C paints on the drawing', 2: '#C C draws on the painting', 44: '#C C draws on the painting', 20: '#C C draws on the painting', 7: '#C C paints on the canvas with the paint'}.\n"
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for segment_localization: \nThere are 90 segments in total, ranging from 0 to 89. The most relevant segments are: {55: '#C C draws on the drawing board using the paint brush', 58: '#C C draws on the painting with the paint brush', 4: '#C C paints on the drawing', 44: '#C C draws on the painting', 20: '#C C draws on the painting'}.\n"
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for segment_localization: \nThere are 90 segments in total, ranging from 0 to 89. The most relevant segments are: {60: '#C C transfers the drawing pen to the left', 63: '#C C draws on the painting with the drawing pen', 4: '#C C paints on the drawing', 55: '#C C draws on the drawing board using the paint brush', 67: '#C C puts the drawing pen on the'}.\n"
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for segment_localization: \nThere are 90 segments in total, ranging from 0 to 89. The most relevant segments are: {20: '#C C draws on the painting', 55: '#C C draws on the drawing board using the paint brush', 60: '#C C transfers the drawing pen to the left', 76: '#C C touches the drawing with the pen ', 44: '#C C draws on the painting'}.\n"
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for segment_localization: \nThere are 90 segments in total, ranging from 0 to 89. The most relevant segments are: {74: '#C C draws the picture', 20: '#C C draws on the painting', 71: '#C C draws on the drawing', 27: '#C C draws on the painting', 31: '#C C draws on the drawing'}.\n"
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for segment_localization: \nThere are 90 segments in total, ranging from 0 to 89. The most relevant segments are: {80: '#C C moves her hand towards the drawing', 73: '#C C draws on the drawing paper with the paint', 76: '#C C touches the drawing with the pen ', 2: '#C C draws on the painting', 4: '#C C paints on the drawing'}.\n"
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for segment_localization: \nThere are 90 segments in total, ranging from 0 to 89. The most relevant segments are: {67: '#C C puts the drawing pen on the', 64: '#C C places the pen on the', 74: '#C C draws the picture', 44: '#C C draws on the painting', 89: '#C C draws the picture'}.\n"
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for segment_localization: \nThere are 90 segments in total, ranging from 0 to 89. The most relevant segments are: {2: '#C C draws on the painting', 4: '#C C paints on the drawing', 44: '#C C draws on the painting', 3: '#C C paints the picture', 20: '#C C draws on the painting'}.\n"
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for segment_localization: \nThere are 90 segments in total, ranging from 0 to 89. The most relevant segments are: {4: '#C C paints on the drawing', 2: '#C C draws on the painting', 44: '#C C draws on the painting', 87: '#C C draws on the drawing book with the paint', 88: '#C C paints the picture drawing on the'}.\n"
+    },
+    {
+      "role": "assistant",
+      "content": "{\"thought\":\"I have candidate segments for various aspects. The segment_localization shows possible tool changes (paintbrush around 55-58, drawing pen around 60-67). Let me retrieve captions across the video to understand the overall narrative and identify turning points.\",\"actions\":[{\"tool\":\"caption_retrieval\",\"inputs\":\"(0, 14)\"},{\"tool\":\"caption_retrieval\",\"inputs\":\"(15, 29)\"},{\"tool\":\"caption_retrieval\",\"inputs\":\"(30, 44)\"},{\"tool\":\"caption_retrieval\",\"inputs\":\"(45, 59)\"},{\"tool\":\"caption_retrieval\",\"inputs\":\"(60, 74)\"},{\"tool\":\"caption_retrieval\",\"inputs\":\"(75, 89)\"}],\"final_answer\":null}"
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for caption_retrieval: \nThere are 90 segments in total, ranging from 0 to 89. Caption of segments from 0 to 14 is {0: '#C C draws on the drawing', 60: '#C C draws on the drawing with the paint brush', 120: '#C C paints on the drawing', 180: '#C C draws with a paint brush', 240: '#C C draws on the drawing', 300: '#C C draws on the paper with the paint brush', 360: '#C C draws the picture', 420: '#C C paints on the paper with the paint', 480: '#C C paints the picture drawing on the table with the', 540: '#C C stops drawing the picture', 600: '#C C looks at the drawing', 660: '#C C dips the paint brush in her right hand into the container of water on the', 720: '#C C takes paint from the paint palette with the paint brush in her right', 780: '#C C removes the paint brush from the paint', 840: '#C C picks up the paint brush from the table with her right'}\n"
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for caption_retrieval: \nThere are 90 segments in total, ranging from 0 to 89. Caption of segments from 15 to 29 is {900: '#C C removes the paint brush from the paint pen', 960: '#C C draws on the painting', 1020: '#C C draws on a drawing paper with a paint', 1080: '#C C paints on the painting with the paint', 1140: '#C C draws the picture', 1200: '#C C draws the picture', 1260: '#C C paints the picture drawing on the table with the paint', 1320: '#C C draws on the painting with the paint', 1380: '#C C draws on the drawing paper with a', 1440: '#C C draws on the paper with a drawing', 1500: '#C C draws on a drawing', 1560: '#C C draws on the', 1620: '#C C draws on the drawing book with the pen in his right', 1680: '#C C draws on the drawing board with a drawing', 1740: '#C C draws on the drawing paper with the paint'}\n"
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for caption_retrieval: \nThere are 90 segments in total, ranging from 0 to 89. Caption of segments from 30 to 44 is {1800: '#C C draws on the drawing board with a pen', 1860: '#C C draws on the drawing board with the pen in his', 1920: '#C C draws on the drawing', 1980: '#C C draws on the drawing book with the paint', 2040: '#C C touches the tip of the pen with his left hand', 2100: '#C C picks a drawing pen from the table', 2160: '#C C draws on the drawing book with the pen in his left', 2220: '#C C draws on the drawing paper with a paint', 2280: '#C C draws on the paper with the paint brush', 2340: '#C C draws on the drawing paper with a pen', 2400: '#C C draws on the drawing paper with the pen', 2460: '#C C draws on the painting with the paint', 2520: '#C C draws on the drawing paper with the paint', 2580: '#C C draws on the drawing paper with the', 2640: '#C C draws on the drawing paper with a paint'}\n"
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for caption_retrieval: \nThere are 90 segments in total, ranging from 0 to 89. Caption of segments from 45 to 59 is {2700: '#C C draws on the drawing paper with the drawing pen', 2760: '#C C draws on the drawing book with the', 2820: '#C C draws on the paper with the', 2880: '#C C draws on the drawing book with the', 2940: '#C C removes his hand from the table', 3000: '#C C puts the pen on the table', 3060: '#C C puts the pencil on the table', 3120: '#C C picks up a color pen from the table with his right', 3180: '#C C draws on the paper with the paint brush', 3240: '#C C draws on the table with the paint brush', 3300: '#C C draws on the painting with the paint brush', 3360: '#C C draws on the painting with the paint', 3420: '#C C draws on the drawing sheet with the black', 3480: '#C C paints the sketch with the pen in her right hand', 3540: '#C C draws on the drawing paper with the paint'}\n"
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for caption_retrieval: \nThere are 90 segments in total, ranging from 0 to 89. Caption of segments from 60 to 74 is {3600: '#C C removes the paint brush from the paint', 3660: '#C C draws on the drawing paper with the paint', 3720: '#C C draws on the paper with the paint brush', 3780: '#C C draws on the paper with the', 3840: '#C C picks the color pen from the table', 3900: '#C C picks up a paint brush from the table with her right', 3960: '#C C picks up a paint marker from the', 4020: '#C C drops the paint brush on the table', 4080: '#C C takes out the paint brush from the paint', 4140: '#C C drops the color pen on the table', 4200: '#C C paints on the painting with the paint', 4260: '#C C draws on the drawing board using the paintbrush', 4320: '#C C moves her hand away from the drawing', 4380: '#C C draws on the paper with the drawing pen', 4440: '#C C draws on the drawing board with a drawing'}\n"
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for caption_retrieval: \nThere are 90 segments in total, ranging from 0 to 89. Caption of segments from 75 to 89 is {4500: '#C C paints on the paper with the brush', 4560: '#C C draws on the paper with the drawing', 4620: '#C C covers the pen with the', 4680: '#C C pulls the black marker from the', 4740: '#C C touches the drawing with his left', 4800: '#C C removes the paint brush from the white color', 4860: '#C C picks the drawing pen from the', 4920: '#C C picks up the paint brush from the table', 4980: '#C C picks a paint brush on a container', 5040: '#C C dips the paint brush in a color palette', 5100: '#C C dips the paint brush in the paint palette', 5160: '#C C draws with the paint brush', 5220: '#C C draws on the paper with the paint', 5280: '#C C paints the picture with the paint', 5340: '#C C paints on the drawing with the paint brush'}\n"
+    },
+    {
+      "role": "assistant",
+      "content": "{\"thought\":\"The captions show a lot of drawing/painting activity with various tools (paint brush, drawing pen, color pen). I need to determine which of the options best matches the critical moments. Option 1 about switching tools (paintbrush to color pen) seems most concrete. Let me query object memory about tools and use visual QA at key segments to verify.\",\"actions\":[{\"tool\":\"object_memory_querying\",\"inputs\":\"What tools does the artist use in the video?\"},{\"tool\":\"object_memory_querying\",\"inputs\":\"In which segments does the artist use a color pen?\"},{\"tool\":\"visual_question_answering\",\"inputs\":\"('what tool is the artist using and what is the artist doing', 56)\"},{\"tool\":\"visual_question_answering\",\"inputs\":\"('what tool is the artist using and what is the artist doing', 64)\"},{\"tool\":\"visual_question_answering\",\"inputs\":\"('what tool is the artist using and what is the artist doing', 4)\"}],\"final_answer\":null}"
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for object_memory_querying: I cannot answer this question."
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for object_memory_querying: I cannot answer this question."
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for visual_question_answering: \nSegment description: The video is about a person painting a picture of a field on a piece of paper using a green paintbrush.\nAnswer to the question: The artist is using a paintbrush to paint on a piece of paper. The artist is also seen holding a pencil and a paintbrush in different scenes.\n"
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for visual_question_answering: \nSegment description: The video is about a person painting a picture on a piece of paper using different colors of paint.\nAnswer to the question: The artist is using a paintbrush to paint on a piece of paper. The artist is also using a pencil to draw on a piece of paper.\n"
+    },
+    {
+      "role": "user",
+      "content": "Local tool result for visual_question_answering: \nSegment description: The video is about a person painting a picture of a field on a piece of paper. The person uses a brush to paint the picture, and the video shows the process of painting the picture.\nAnswer to the question: The artist is using a brush to paint on a piece of paper. The artist is painting a picture of a field and a house.\n"
+    },
+    {
+      "role": "assistant",
+      "content": "{\"thought\":\"Based on the evidence gathered, the video shows the artist using various tools: a paintbrush for painting and at later segments picking up a color pen (segments 56, 64). The captions explicitly show the artist switching tools \u2014 'picks up a color pen from the table' and 'picks the color pen from the table' \u2014 after painting with the paintbrush. This tool-switching represents a clear turning point in the creative process that demonstrates the artist's thought process and proficiency, as the color pen allows finer detail work. The other options (adding/removing details, light/heavy touch, warm/cool palette) are not clearly supported by the captions or visual descriptions. Therefore, option 1 is the best supported answer.\",\"actions\":[],\"final_answer\":1}"
+    }
+  ],
+  "tool_calls": [
+    {
+      "tool": "load_video_into_sandbox",
+      "inputs": "0c481667-9303-4f4a-b331-0b412aaafa2d.mp4"
+    },
+    {
+      "tool": "preprocess",
+      "inputs": ""
+    },
+    {
+      "tool": "segment_localization",
+      "inputs": "artist painting"
+    },
+    {
+      "tool": "segment_localization",
+      "inputs": "artist using paintbrush"
+    },
+    {
+      "tool": "segment_localization",
+      "inputs": "artist using color pen"
+    },
+    {
+      "tool": "segment_localization",
+      "inputs": "artist adding details"
+    },
+    {
+      "tool": "segment_localization",
+      "inputs": "artist removing details"
+    },
+    {
+      "tool": "segment_localization",
+      "inputs": "artist using light touch"
+    },
+    {
+      "tool": "segment_localization",
+      "inputs": "artist using heavy touch"
+    },
+    {
+      "tool": "segment_localization",
+      "inputs": "artist using warm colors"
+    },
+    {
+      "tool": "segment_localization",
+      "inputs": "artist using cool colors"
+    },
+    {
+      "tool": "caption_retrieval",
+      "inputs": "(0, 14)"
+    },
+    {
+      "tool": "caption_retrieval",
+      "inputs": "(15, 29)"
+    },
+    {
+      "tool": "caption_retrieval",
+      "inputs": "(30, 44)"
+    },
+    {
+      "tool": "caption_retrieval",
+      "inputs": "(45, 59)"
+    },
+    {
+      "tool": "caption_retrieval",
+      "inputs": "(60, 74)"
+    },
+    {
+      "tool": "caption_retrieval",
+      "inputs": "(75, 89)"
+    },
+    {
+      "tool": "object_memory_querying",
+      "inputs": "What tools does the artist use in the video?"
+    },
+    {
+      "tool": "object_memory_querying",
+      "inputs": "In which segments does the artist use a color pen?"
+    },
+    {
+      "tool": "visual_question_answering",
+      "inputs": "('what tool is the artist using and what is the artist doing', 56)"
+    },
+    {
+      "tool": "visual_question_answering",
+      "inputs": "('what tool is the artist using and what is the artist doing', 64)"
+    },
+    {
+      "tool": "visual_question_answering",
+      "inputs": "('what tool is the artist using and what is the artist doing', 4)"
+    }
+  ],
+  "stats": {
+    "total_calls": 22,
+    "exact_hits": 0,
+    "prefix_hits": 0,
+    "cache_misses": 22,
+    "tool_executions": 22,
+    "environment_forks": 0,
+    "cache_puts": 0
+  },
+  "provider_usage": [
+    {
+      "prompt_tokens": 1947,
+      "completion_tokens": 148,
+      "total_tokens": 2095,
+      "prompt_tokens_details": {
+        "cached_tokens": 1792
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 41
+      },
+      "prompt_cache_hit_tokens": 1792,
+      "prompt_cache_miss_tokens": 155
+    },
+    {
+      "prompt_tokens": 2089,
+      "completion_tokens": 355,
+      "total_tokens": 2444,
+      "prompt_tokens_details": {
+        "cached_tokens": 1920
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 177
+      },
+      "prompt_cache_hit_tokens": 1920,
+      "prompt_cache_miss_tokens": 169
+    },
+    {
+      "prompt_tokens": 3102,
+      "completion_tokens": 306,
+      "total_tokens": 3408,
+      "prompt_tokens_details": {
+        "cached_tokens": 2048
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 138
+      },
+      "prompt_cache_hit_tokens": 2048,
+      "prompt_cache_miss_tokens": 1054
+    },
+    {
+      "prompt_tokens": 4865,
+      "completion_tokens": 816,
+      "total_tokens": 5681,
+      "prompt_tokens_details": {
+        "cached_tokens": 3072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 598
+      },
+      "prompt_cache_hit_tokens": 3072,
+      "prompt_cache_miss_tokens": 1793
+    },
+    {
+      "prompt_tokens": 5348,
+      "completion_tokens": 829,
+      "total_tokens": 6177,
+      "prompt_tokens_details": {
+        "cached_tokens": 4864
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 662
+      },
+      "prompt_cache_hit_tokens": 4864,
+      "prompt_cache_miss_tokens": 484
+    }
+  ],
+  "provider_token_totals": {
+    "prompt_tokens": 17351,
+    "completion_tokens": 2454,
+    "total_tokens": 19805
+  }
+}

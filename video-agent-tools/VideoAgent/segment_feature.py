@@ -4,27 +4,48 @@ import torch
 import json
 import cv2
 import pickle
+from pathlib import Path
 from InternVid.viclip import get_viclip, frames2tensor, get_vid_feat
 from encoder import encode_sentences
+from runtime_config import MODEL_CONFIG, resolve_video_agent_path
 
 
 model_cfgs = {
-    'viclip-l-internvid-10m-flt': {
-        'size': 'l',
-        'pretrained': 'tool_models/viCLIP/ViClip-InternVid-10M-FLT.pth',
+    f'viclip-{MODEL_CONFIG.viclip_variant}-internvid-10m-flt': {
+        'size': MODEL_CONFIG.viclip_variant,
+        'pretrained': Path(MODEL_CONFIG.viclip_checkpoint),
     }
 }
 
 class SegmentFeature:
-    def __init__(self, video_path_list, base_dir='preprocess'):
+    def __init__(
+        self,
+        video_path_list,
+        base_dir='preprocess',
+        model_dir=None,
+    ):
         self.video_path_list = video_path_list
         self.base_dir = base_dir
+        self.model_dir = Path(
+            model_dir
+            if model_dir is not None
+            else resolve_video_agent_path("tool_models")
+        )
+        if not self.model_dir.is_absolute():
+            raise ValueError(f"model_dir must be absolute: {self.model_dir}")
+        if not self.model_dir.is_dir():
+            raise NotADirectoryError(
+                f"model_dir must reference a directory: {self.model_dir}"
+            )
         self.seconds_per_feat = 2
         self.frames_per_feat = 10
 
         start_time = time.time()
-        cfg = model_cfgs['viclip-l-internvid-10m-flt']
-        model = get_viclip(cfg['size'], cfg['pretrained'])
+        cfg = next(iter(model_cfgs.values()))
+        model = get_viclip(
+            cfg['size'],
+            os.fspath(self.model_dir / cfg['pretrained']),
+        )
         assert(type(model)==dict and model['viclip'] is not None and model['tokenizer'] is not None)
         self.clip, tokenizer = model['viclip'], model['tokenizer']
         self.clip = self.clip.to("cuda")
@@ -39,7 +60,7 @@ class SegmentFeature:
 
     def create_textual_embedding(self):
         """use the sentence encoder model to embed the captions of all the videos"""
-        model='text-embedding-3-large'
+        model='clip'
         for video_path in self.video_path_list:
             start_time = time.time()
             base_name = os.path.basename(video_path).replace(".mp4", "")
@@ -47,7 +68,11 @@ class SegmentFeature:
             with open(os.path.join(video_dir, 'captions.json')) as f:
                 captions = json.load(f)
             caps = list(captions.values())
-            caption_emb = encode_sentences(sentence_list=caps, model_name=model)
+            caption_emb = encode_sentences(
+                sentence_list=caps,
+                model_name=model,
+                model_dir=self.model_dir,
+            )
             print(caption_emb)
             with open(os.path.join(video_dir, f'segment_textual_embedding.pkl'), 'wb') as f:
                 pickle.dump(caption_emb, f)
@@ -98,4 +123,3 @@ class SegmentFeature:
     def run(self):
         self.create_textual_embedding()
         self.create_visual_embedding()
-

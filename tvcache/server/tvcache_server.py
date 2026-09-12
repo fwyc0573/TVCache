@@ -459,6 +459,45 @@ def get_all_envs_endpoint():
     return jsonify({"env_ids": env_ids})
 
 
+@app.route('/drain_task', methods=['POST'])
+def drain_task_endpoint():
+    """Detach and return all cached environment IDs for a completed task."""
+    data = request.get_json()
+    task_name = data.get('task_name')
+    drain_id = data.get('drain_id')
+
+    if not isinstance(task_name, str) or not task_name:
+        return jsonify({"error": "task_name is required"}), 400
+    if not isinstance(drain_id, str) or not drain_id:
+        return jsonify({"error": "drain_id is required"}), 400
+
+    env_ids = cache.drain_task(task_name, drain_id)
+    return jsonify({
+        "success": True,
+        "drain_id": drain_id,
+        "env_ids": env_ids,
+    })
+
+
+@app.route('/ack_task_drain', methods=['POST'])
+def ack_task_drain_endpoint():
+    """Acknowledge ownership transfer for a completed task drain."""
+    data = request.get_json()
+    task_name = data.get('task_name')
+    drain_id = data.get('drain_id')
+
+    if not isinstance(task_name, str) or not task_name:
+        return jsonify({"error": "task_name is required"}), 400
+    if not isinstance(drain_id, str) or not drain_id:
+        return jsonify({"error": "drain_id is required"}), 400
+
+    success = cache.ack_task_drain(task_name, drain_id)
+    return jsonify({
+        "success": success,
+        "drain_id": drain_id,
+    })
+
+
 @app.route('/')
 def serve_visualizer():
     """Serve the visualizer HTML page."""
@@ -693,7 +732,7 @@ def _start_auto_save():
         auto_save_config['thread'].start()
 
 
-def run_server(host: str = '0.0.0.0', port: int = 8000, debug: bool = False,
+def run_server(host: str = '127.0.0.1', port: int = 8001, debug: bool = False,
                auto_save: bool = False, save_interval: int = 300):
     """Run the TVCache server.
 
@@ -719,8 +758,8 @@ if __name__ == '__main__':
     import argparse
     
     parser = argparse.ArgumentParser(description='Run the TVCache server')
-    parser.add_argument('--host', type=str, default='0.0.0.0',
-                        help='Host address to bind to (default: 0.0.0.0)')
+    parser.add_argument('--host', type=str, default='127.0.0.1',
+                        help='Host address to bind to (default: 127.0.0.1)')
     parser.add_argument('--port', type=int, default=8001,
                         help='Port to listen on (default: 8001)')
     parser.add_argument('--debug', action='store_true',

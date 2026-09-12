@@ -5,5 +5,25 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "tinker>=0.6.3",
+    "chz",
+    "datasets",
+    "httpx",
+    "pydantic",
+    "tinker==0.24.1",
+    "tinker-cookbook",
+    "torch==2.13.0+cpu",
+    "tvclient",
 ]
+
+[tool.uv]
+environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
+
+[tool.uv.sources]
+tinker-cookbook = { path = "tinker-cookbook", editable = true }
+torch = { index = "pytorch-cpu" }
+tvclient = { path = "../tvcache/client", editable = true }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true

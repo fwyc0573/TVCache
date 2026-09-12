@@ -9,7 +9,7 @@ import timm
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from transformers import DistilBertModel, GPT2LMHeadModel
+from transformers import DistilBertModel, GPT2Config, GPT2LMHeadModel
 
 import lavila.models.loss as loss
 from lavila.models.gpt2_gated import GPT2LMHeadModel as GatedGPT2LMHeadModel
@@ -886,6 +886,7 @@ def VCLM_OPENAI_VITL14_336PX_GPT2_XL(gated_xattn=False, freeze_lm_vclm=False,
 
 def VCLM_OPENAI_TIMESFORMER_BASE_GPT2(
     gated_xattn=False,
+    random_init_visual=False,
     random_init_gpt2=False,
     freeze_lm_vclm=False,
     freeze_visual_vclm=False,
@@ -902,19 +903,22 @@ def VCLM_OPENAI_TIMESFORMER_BASE_GPT2(
         act_layer=QuickGELU,
         is_tanh_gating=timesformer_gated_xattn,
     )
-    clip_model, _ = load_openai_clip('ViT-B/16', 'cpu')
-    print("=> Loading CLIP (ViT-B/16) weights")
-    remapped_state_dict = remap_keys(clip_model.visual.state_dict(), transformer_layers=12)
-    res = vision_model.load_state_dict(remapped_state_dict, strict=False)
-    print(res)
+    if random_init_visual:
+        print("=> Randomly initializing the visual dependency before checkpoint load")
+    else:
+        clip_model, _ = load_openai_clip('ViT-B/16', 'cpu')
+        print("=> Loading CLIP (ViT-B/16) weights")
+        remapped_state_dict = remap_keys(clip_model.visual.state_dict(), transformer_layers=12)
+        res = vision_model.load_state_dict(remapped_state_dict, strict=False)
+        print(res)
     vision_model.head = nn.Identity()
     vision_model.pre_logits = nn.Identity()
     vision_model.fc = nn.Identity()
 
-    gpt2 = GPT2LMHeadModel.from_pretrained(
-        "gpt2",
-        use_cache=False,
-    )
+    if random_init_gpt2:
+        gpt2 = GPT2LMHeadModel(GPT2Config())
+    else:
+        gpt2 = GPT2LMHeadModel.from_pretrained("gpt2", use_cache=False)
     new_config = augment_gpt2_config(gpt2.config, cross_attn_freq=1, gated_xattn=gated_xattn)
     text_decoder = GatedGPT2LMHeadModel(new_config)
     if not random_init_gpt2:

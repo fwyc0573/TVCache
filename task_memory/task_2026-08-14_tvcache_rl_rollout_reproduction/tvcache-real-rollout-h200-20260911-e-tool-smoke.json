@@ -1,0 +1,84 @@
+{
+  "sandbox_id": "tool-smoke-39a270c9a9464ecf9b5ff15c26e9b4f5",
+  "video_id": "0c481667-9303-4f4a-b331-0b412aaafa2d",
+  "calls": [
+    {
+      "endpoint": "/start",
+      "command": null,
+      "status_code": 200,
+      "seconds": 0.005783644039183855,
+      "body": {
+        "sandbox_id": "tool-smoke-39a270c9a9464ecf9b5ff15c26e9b4f5",
+        "sandbox_path": "/data/ycfeng/tmp/tvcache-real-rollout-20260909/sandboxes/tool-smoke-39a270c9a9464ecf9b5ff15c26e9b4f5",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "load_video_into_sandbox",
+      "status_code": 200,
+      "seconds": 0.2806355939246714,
+      "body": {
+        "command": "load_video_into_sandbox",
+        "result": "Successfully loaded video into the sandbox",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "preprocess",
+      "status_code": 200,
+      "seconds": 126.25690889870748,
+      "body": {
+        "command": "preprocess",
+        "result": "Preprocessing completed",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "caption_retrieval",
+      "status_code": 200,
+      "seconds": 0.7496583857573569,
+      "body": {
+        "command": "caption_retrieval",
+        "result": "\nThere are 90 segments in total, ranging from 0 to 89. Caption of segments from 0 to 1 is {0: '#C C paints the picture on the table with the paint', 60: '#C C paints on the painting with the paint brush'}\n",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "segment_localization",
+      "status_code": 200,
+      "seconds": 2.025008159223944,
+      "body": {
+        "command": "segment_localization",
+        "result": "\nThere are 90 segments in total, ranging from 0 to 89. The most relevant segments are: {45: '#C C draws on the painting', 73: '#C C draws on the art work with the paintbrush', 74: '#C C paints the picture', 71: '#C C paints on the painting with the paint brush', 1: '#C C paints on the drawing'}.\n",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "visual_question_answering",
+      "status_code": 200,
+      "seconds": 23.325638240668923,
+      "body": {
+        "command": "visual_question_answering",
+        "result": "\nSegment description: The video is about a person painting a picture of a field on a wall.\nAnswer to the question: The person is painting a picture of a field on a wall.\n",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/stop",
+      "command": null,
+      "status_code": 200,
+      "seconds": 0.05033704312518239,
+      "body": {
+        "operation_id": "8254b1d4c085489d8a48b0a76b306e8a",
+        "sandbox_id": "tool-smoke-39a270c9a9464ecf9b5ff15c26e9b4f5",
+        "success": true
+      }
+    }
+  ],
+  "status": "PASS"
+}

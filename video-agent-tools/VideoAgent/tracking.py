@@ -16,6 +16,8 @@ from time import time
 import math
 import sys
 from io import StringIO
+from pathlib import Path
+from runtime_config import MODEL_CONFIG, resolve_video_agent_path
 
 
 id2category = {
@@ -103,17 +105,61 @@ id2category = {
 
 
 class Tracking:
-    def __init__(self, video_path_list, base_dir='preprocess',tracking_fps=30, sample_num=10, show=False):
+    def __init__(
+        self,
+        video_path_list,
+        base_dir='preprocess',
+        tracking_fps=30,
+        sample_num=10,
+        show=False,
+        model_dir=None,
+    ):
         self.video_path_list = video_path_list
         self.base_dir = base_dir
         self.tracking_fps = tracking_fps
         self.sample_num = sample_num
         self.show = show
+        self.model_dir = Path(
+            model_dir
+            if model_dir is not None
+            else resolve_video_agent_path("tool_models")
+        )
+        if not self.model_dir.is_absolute():
+            raise ValueError(f"model_dir must be absolute: {self.model_dir}")
+        if not self.model_dir.is_dir():
+            raise NotADirectoryError(
+                f"model_dir must reference a directory: {self.model_dir}"
+            )
 
-        self.clip_model, self.clip_transform = clip.load("tool_models/CLIP/ViT-B-32.pt", device="cuda")
+        self.clip_model, self.clip_transform = clip.load(
+            str(self.model_dir / "CLIP" / MODEL_CONFIG.clip_checkpoint),
+            device="cuda",
+        )
         
 
-        self.dinov2_model = torch.hub.load('tool_models/facebookresearch_dinov2_main', 'dinov2_vitg14', source="local").cuda()
+        dinov2_source = self.model_dir / "facebookresearch_dinov2_main"
+        dinov2_checkpoint = dinov2_source / MODEL_CONFIG.dinov2_checkpoint
+        if not dinov2_checkpoint.is_file():
+            raise FileNotFoundError(
+                f"DINOv2 checkpoint is required: {dinov2_checkpoint}"
+            )
+        self.dinov2_model = torch.hub.load(
+            str(dinov2_source),
+            MODEL_CONFIG.dinov2_constructor,
+            source="local",
+            pretrained=False,
+        )
+        state_dict = torch.load(dinov2_checkpoint, map_location="cpu")
+        if "teacher" in state_dict:
+            state_dict = state_dict["teacher"]
+        if "state_dict" in state_dict:
+            state_dict = state_dict["state_dict"]
+        state_dict = {
+            key.removeprefix("module.").removeprefix("backbone."): value
+            for key, value in state_dict.items()
+        }
+        self.dinov2_model.load_state_dict(state_dict, strict=True)
+        self.dinov2_model = self.dinov2_model.cuda()
 
         self.dinov2_transform = T.Compose([
             T.Resize(256, interpolation=T.InterpolationMode.BICUBIC),
@@ -123,7 +169,9 @@ class Tracking:
         ])
 
         
-        self.model = RTDETR('tool_models/tracking/rtdetr-l.pt')
+        self.model = RTDETR(
+            str(self.model_dir / "tracking" / MODEL_CONFIG.rtdetr_checkpoint)
+        )
 
 
     def object_tracking(self):

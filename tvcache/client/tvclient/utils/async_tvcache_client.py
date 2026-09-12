@@ -4,6 +4,32 @@ import httpx
 from typing import Optional, Tuple, Dict, Any, List
 
 
+def _require_boolean(data: Dict[str, Any], field: str) -> bool:
+    value = data[field]
+    if type(value) is not bool:
+        raise TypeError(f"TVCache response field '{field}' must be a boolean")
+    return value
+
+
+def _require_string(data: Dict[str, Any], field: str) -> str:
+    value = data[field]
+    if not isinstance(value, str):
+        raise TypeError(f"TVCache response field '{field}' must be a string")
+    return value
+
+
+def _require_string_list(data: Dict[str, Any], field: str) -> List[str]:
+    value = data[field]
+    if not isinstance(value, list) or not all(
+        isinstance(item, str)
+        for item in value
+    ):
+        raise TypeError(
+            f"TVCache response field '{field}' must be a list of strings"
+        )
+    return value
+
+
 class AsyncTVCacheClient:
     """Async client for interacting with the TVCache HTTP server."""
 
@@ -45,15 +71,13 @@ class AsyncTVCacheClient:
         Returns:
             True if an exact match exists, False otherwise.
         """
-        try:
-            client = await self._get_client()
-            response = await client.get(
-                f"{self.base_url}/get",
-                params={"task_name": task_name, "tool_calls": tool_calls}
-            )
-            return response.status_code == 200 and response.json().get("found", False)
-        except httpx.HTTPError:
-            return False
+        client = await self._get_client()
+        response = await client.get(
+            f"{self.base_url}/get",
+            params={"task_name": task_name, "tool_calls": tool_calls}
+        )
+        response.raise_for_status()
+        return _require_boolean(response.json(), "found")
 
     async def get(self, task_name: str, tool_calls: List[str]) -> Tuple[Optional[str], Optional[Any], Optional[float]]:
         """Get the environment ID, value, and execution time for an exact match.
@@ -117,21 +141,33 @@ class AsyncTVCacheClient:
         Returns:
             A tuple of (env_id, serialized_history). Both are None if no prefix match found.
         """
-        try:
-            client = await self._get_client()
-            response = await client.post(
-                f"{self.base_url}/prefix_match",
-                json={"task_name": task_name, "tool_calls": tool_calls}
-            )
-            response.raise_for_status()
-            data = response.json()
+        client = await self._get_client()
+        response = await client.post(
+            f"{self.base_url}/prefix_match",
+            json={"task_name": task_name, "tool_calls": tool_calls}
+        )
+        response.raise_for_status()
+        data = response.json()
 
-            if data.get("found"):
-                return data.get("env_id"), data.get("history")
-            else:
-                return None, []
-        except httpx.HTTPError:
-            return None, []
+        found = _require_boolean(data, "found")
+        if found:
+            return (
+                _require_string(data, "env_id"),
+                _require_string_list(data, "history"),
+            )
+
+        if data["env_id"] is not None:
+            raise TypeError(
+                "TVCache response field 'env_id' must be null when "
+                "'found' is false"
+            )
+        history = data["history"]
+        if history is not None and history != []:
+            raise TypeError(
+                "TVCache response field 'history' must be null or empty "
+                "when 'found' is false"
+            )
+        return None, []
 
     async def mark_stateless(self, task_name: str, history: List[str], env_id: str) -> bool:
         """Update the state of a cached environment.
@@ -185,7 +221,10 @@ class AsyncTVCacheClient:
         )
         response.raise_for_status()
         data = response.json()
-        return data.get("removed_env_ids", [])
+        success = _require_boolean(data, "success")
+        if not success:
+            raise RuntimeError("TVCache server rejected cache publication")
+        return _require_string_list(data, "removed_env_ids")
 
     async def remove(self, task_name: str, history: List[str]) -> bool:
         """Remove a specific tool call history from the cache.
@@ -342,17 +381,14 @@ class AsyncTVCacheClient:
             - found: True if the node was found, False otherwise.
             - test_result: The test result string if found, None otherwise.
         """
-        try:
-            client = await self._get_client()
-            response = await client.get(
-                f"{self.base_url}/get_test_result",
-                params={"task_name": task_name, "tool_calls": tool_calls}
-            )
-            response.raise_for_status()
-            data = response.json()
-            return data.get("found", False), data.get("test_result")
-        except httpx.HTTPError:
-            return False, None
+        client = await self._get_client()
+        response = await client.get(
+            f"{self.base_url}/get_test_result",
+            params={"task_name": task_name, "tool_calls": tool_calls}
+        )
+        response.raise_for_status()
+        data = response.json()
+        return data["found"], data.get("test_result")
 
     async def unref(self, env_id: str, task_name: Optional[str] = None) -> bool:
         """Unreference an environment ID from the cache.
@@ -364,21 +400,18 @@ class AsyncTVCacheClient:
         Returns:
             True if the operation was successful, False otherwise.
         """
-        try:
-            payload = {"env_id": env_id}
-            if task_name is not None:
-                payload["task_name"] = task_name
+        payload = {"env_id": env_id}
+        if task_name is not None:
+            payload["task_name"] = task_name
 
-            client = await self._get_client()
-            response = await client.post(
-                f"{self.base_url}/unref",
-                json=payload
-            )
-            response.raise_for_status()
-            data = response.json()
-            return data.get("success", False)
-        except httpx.HTTPError:
-            return False
+        client = await self._get_client()
+        response = await client.post(
+            f"{self.base_url}/unref",
+            json=payload
+        )
+        response.raise_for_status()
+        data = response.json()
+        return data["success"]
 
     async def get_all_envs(self, task_name: str) -> List[str]:
         """Get all environment IDs in the prefix tree for a given task.
@@ -389,14 +422,62 @@ class AsyncTVCacheClient:
         Returns:
             List of all environment IDs present in the task's prefix tree.
         """
-        try:
-            client = await self._get_client()
-            response = await client.get(
-                f"{self.base_url}/get_all_envs",
-                params={"task_name": task_name}
+        client = await self._get_client()
+        response = await client.get(
+            f"{self.base_url}/get_all_envs",
+            params={"task_name": task_name}
+        )
+        response.raise_for_status()
+        data = response.json()
+        return data["env_ids"]
+
+    async def drain_task(
+        self,
+        task_name: str,
+        drain_id: str,
+    ) -> List[str]:
+        """Detach and return cached environment IDs for a completed task."""
+        client = await self._get_client()
+        response = await client.post(
+            f"{self.base_url}/drain_task",
+            json={
+                "task_name": task_name,
+                "drain_id": drain_id,
+            },
+        )
+        response.raise_for_status()
+        data = response.json()
+        success = _require_boolean(data, "success")
+        if not success:
+            raise RuntimeError("TVCache server rejected task drain")
+        returned_drain_id = _require_string(data, "drain_id")
+        if returned_drain_id != drain_id:
+            raise RuntimeError(
+                "TVCache task drain response returned a mismatched drain_id"
             )
-            response.raise_for_status()
-            data = response.json()
-            return data.get("env_ids", [])
-        except httpx.HTTPError:
-            return []
+        return _require_string_list(data, "env_ids")
+
+    async def ack_task_drain(
+        self,
+        task_name: str,
+        drain_id: str,
+    ) -> None:
+        """Acknowledge ownership transfer for a completed task drain."""
+        client = await self._get_client()
+        response = await client.post(
+            f"{self.base_url}/ack_task_drain",
+            json={
+                "task_name": task_name,
+                "drain_id": drain_id,
+            },
+        )
+        response.raise_for_status()
+        data = response.json()
+        success = _require_boolean(data, "success")
+        if not success:
+            raise RuntimeError("TVCache server rejected task drain ACK")
+        returned_drain_id = _require_string(data, "drain_id")
+        if returned_drain_id != drain_id:
+            raise RuntimeError(
+                "TVCache task drain ACK returned a mismatched drain_id"
+            )

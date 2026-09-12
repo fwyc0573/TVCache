@@ -1,0 +1,25 @@
+{
+  "python": "3.10.20 (main, May 10 2026, 19:27:29) [Clang 22.1.3 ]",
+  "torch": "2.1.2+cu121",
+  "gpu": "NVIDIA H200",
+  "constructors": [
+    {
+      "class": "Captioning",
+      "seconds": 101.81362501345575,
+      "allocated_bytes": 1326561280,
+      "peak_allocated_bytes": 1326561280
+    },
+    {
+      "class": "SegmentFeature",
+      "seconds": 102.35898437723517,
+      "allocated_bytes": 1712142848,
+      "peak_allocated_bytes": 1712142848
+    },
+    {
+      "class": "Tracking",
+      "seconds": 30.771758383139968,
+      "allocated_bytes": 448610304,
+      "peak_allocated_bytes": 448610304
+    }
+  ]
+}

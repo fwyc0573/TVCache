@@ -1,10 +1,14 @@
 from flask import Flask, request, jsonify
+from runtime_config import resolve_required_directory
 from sandbox_manager import SandboxManager
 import traceback
 import time
 
 app = Flask(__name__)
-sandbox_manager = SandboxManager(base_dir='./sandboxes', show_tracking=False)
+sandbox_manager = SandboxManager(
+    base_dir=resolve_required_directory("VIDEO_AGENT_SANDBOX_DIR"),
+    show_tracking=False,
+)
 
 @app.route('/start', methods=['POST'])
 def start_sandbox():
@@ -34,15 +38,22 @@ def stop_sandbox():
     try:
         data = request.get_json()
         sandbox_id = data.get('sandbox_id')
+        operation_id = data.get('operation_id')
 
         if not sandbox_id:
             return jsonify({'error': 'sandbox_id is required'}), 400
+        if not isinstance(operation_id, str) or not operation_id:
+            return jsonify({'error': 'operation_id is required'}), 400
 
-        result = sandbox_manager.stop_sandbox(sandbox_id)
+        result = sandbox_manager.stop_sandbox(
+            sandbox_id,
+            operation_id=operation_id,
+        )
 
         return jsonify({
             'success': result,
-            'sandbox_id': sandbox_id
+            'sandbox_id': sandbox_id,
+            'operation_id': operation_id,
         }), 200
 
     except Exception as e:
@@ -67,8 +78,6 @@ def fork_sandbox():
 
     except Exception as e:
         print(f'Failed to fork sandbox: {traceback.format_exc()}', flush=True)
-        with open('sandbox.log', 'a') as log_file:
-            log_file.write(traceback.format_exc())
         return jsonify({'error': str(e), 'traceback': traceback.format_exc()}), 500
 
 
@@ -140,4 +149,4 @@ def execute_command():
         return jsonify({'error': str(e), 'traceback': traceback.format_exc()}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='127.0.0.1', port=5000)

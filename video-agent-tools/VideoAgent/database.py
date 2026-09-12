@@ -6,13 +6,20 @@ from encoder import encode_sentences
 from utils import compute_cosine_similarity, top_k_indices
 import numpy as np
 import sqlite3
+from pathlib import Path
+from runtime_config import resolve_video_agent_path
 
 
 class DataBase:
-    def __init__(self, video_path, base_dir='preprocess', use_reid=True):
+    def __init__(self, video_path, base_dir='preprocess', use_reid=True, model_dir=None):
         base_name = os.path.basename(video_path).replace(".mp4", "")
         self.video_dir = os.path.join(base_dir, base_name)
         self.use_reid = use_reid
+        self.model_dir = Path(
+            model_dir
+            if model_dir is not None
+            else resolve_video_agent_path("tool_models")
+        )
 
         if self.use_reid:
             with open(os.path.join(self.video_dir, 'reid.pkl'), 'rb') as f:
@@ -110,7 +117,11 @@ class DataBase:
 
 
     def retrieve_candidate_objects(self, description):
-        des_emb = encode_sentences([f"a photo of a {description}."], model_name='clip')
+        des_emb = encode_sentences(
+            [f"a photo of a {description}."],
+            model_name='clip',
+            model_dir=self.model_dir,
+        )
         scores = compute_cosine_similarity(des_emb, list(self.uid2emb.values()))
         indices = np.where(scores >= 0.26)[0]
         candidate_uids = []

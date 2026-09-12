@@ -7,23 +7,25 @@ from videollava.mm_utils import tokenizer_image_token, get_model_name_from_path,
 import socket
 import os
 import pickle
+from runtime_config import resolve_required_directory
 
 
 def main():
     disable_torch_init()
     model_path = 'LanguageBind/Video-LLaVA-7B'
-    cache_dir = 'cache_dir'
+    cache_dir = resolve_required_directory("VIDEO_LLAVA_CACHE_DIR")
+    runtime_dir = resolve_required_directory("VIDEO_LLAVA_RUNTIME_DIR")
+    socket_path = runtime_dir / "vqa.sock"
+    content_path = runtime_dir / "content.pkl"
     device = 'cuda'
     load_4bit, load_8bit = True, False
     model_name = get_model_name_from_path(model_path)
     tokenizer, model, processor, _ = load_pretrained_model(model_path, None, model_name, load_8bit, load_4bit, device=device, cache_dir=cache_dir)
     video_processor = processor['video']
     server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    if not os.path.exists("tmp"):
-        os.mkdir("tmp")
-    if os.path.exists("tmp/vqa.sock"):
-        os.unlink("tmp/vqa.sock")
-    server.bind("tmp/vqa.sock")
+    if socket_path.exists():
+        os.unlink(socket_path)
+    server.bind(os.fspath(socket_path))
     server.listen(0)
     print('ready for connection!')
     # with open("tmp/ready.txt", 'w') as f:
@@ -33,7 +35,7 @@ def main():
         r = connection.recv(1024).decode()
         # if r == "stop":
         #     break
-        with open('tmp/content.pkl', 'rb') as f:
+        with content_path.open('rb') as f:
             content = pickle.load(f)
         print(f'PICKLE CONTENT {content}')
         
@@ -77,7 +79,7 @@ def main():
             answers.append(outputs)
         reply = f"Segment description: {answers[0]}\nAnswer to the question: {answers[1]}"
         print(reply)
-        with open('tmp/content.pkl', 'wb') as f:
+        with content_path.open('wb') as f:
             pickle.dump(reply, f)
         connection.send(b'sent')
         r = connection.recv(1024)

@@ -1,0 +1,84 @@
+{
+  "sandbox_id": "tool-smoke-271bc2501e794ddba64fe11e15f800e3",
+  "video_id": "0c481667-9303-4f4a-b331-0b412aaafa2d",
+  "calls": [
+    {
+      "endpoint": "/start",
+      "command": null,
+      "status_code": 200,
+      "seconds": 0.03217641310766339,
+      "body": {
+        "sandbox_id": "tool-smoke-271bc2501e794ddba64fe11e15f800e3",
+        "sandbox_path": "/data/ycfeng/tmp/tvcache-real-rollout-20260909/sandboxes/tool-smoke-271bc2501e794ddba64fe11e15f800e3",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "load_video_into_sandbox",
+      "status_code": 200,
+      "seconds": 0.24752551689743996,
+      "body": {
+        "command": "load_video_into_sandbox",
+        "result": "Successfully loaded video into the sandbox",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "preprocess",
+      "status_code": 200,
+      "seconds": 125.982539805118,
+      "body": {
+        "command": "preprocess",
+        "result": "Preprocessing completed",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "caption_retrieval",
+      "status_code": 200,
+      "seconds": 0.6511129648424685,
+      "body": {
+        "command": "caption_retrieval",
+        "result": "\nThere are 90 segments in total, ranging from 0 to 89. Caption of segments from 0 to 1 is {0: '#C C draws the picture', 60: '#C C draws on the drawing book with the paint brush'}\n",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "segment_localization",
+      "status_code": 200,
+      "seconds": 2.0620364798232913,
+      "body": {
+        "command": "segment_localization",
+        "result": "\nThere are 90 segments in total, ranging from 0 to 89. The most relevant segments are: {3: '#C C draws on the painting', 72: '#C C draws on the painting', 86: '#C C draws on the painting', 18: '#C C draws on the painting', 73: '#C C draws on the drawing board with the paint'}.\n",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "visual_question_answering",
+      "status_code": 200,
+      "seconds": 21.442406905815005,
+      "body": {
+        "command": "visual_question_answering",
+        "result": "\nSegment description: The video is about a person painting a picture of a landscape on a wall using a brush.\nAnswer to the question: The person is painting a picture of a field on a wall using a brush.\n",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/stop",
+      "command": null,
+      "status_code": 200,
+      "seconds": 0.05182394990697503,
+      "body": {
+        "operation_id": "2c575d9070264cb5b7692862f4f5f343",
+        "sandbox_id": "tool-smoke-271bc2501e794ddba64fe11e15f800e3",
+        "success": true
+      }
+    }
+  ],
+  "status": "PASS"
+}

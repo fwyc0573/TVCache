@@ -66,6 +66,11 @@ class ImmutableEnvPrefixTreeCache(PrefixTree):
         self.prefix_tree_locks: Dict[str, threading.Lock] = {}
         self.prefix_tree_env_refs: Dict[str, Dict[str, int]] = {}
         self.prefix_tree_env_count: Dict[str, int] = {}
+        self.pending_task_drains: Dict[
+            str,
+            Tuple[str, Tuple[str, ...]],
+        ] = {}
+        self.acknowledged_task_drains: set[Tuple[str, str]] = set()
 
         self.cache_budget = int(os.environ.get('CACHE_BUDGET', 50))
         self.watermark = int(1 * self.cache_budget) # Evict after reaching the watermark
@@ -376,6 +381,109 @@ class ImmutableEnvPrefixTreeCache(PrefixTree):
                 self.prefix_tree_env_refs[task_name][env_id] += 1
 
         return env_ids
+
+    def drain_task(self, task_name: str, drain_id: str) -> List[str]:
+        """Detach every cached environment for a completed task.
+
+        A task cannot be drained while a cache environment is referenced by
+        an active consumer. The task tree is cleared while holding its lock so
+        later lookups cannot discover any returned environment ID. Detached
+        IDs remain replayable under the same drain ID until acknowledged.
+        """
+        if not isinstance(task_name, str) or not task_name:
+            raise ValueError("task_name must be a non-empty string")
+        if not isinstance(drain_id, str) or not drain_id:
+            raise ValueError("drain_id must be a non-empty string")
+
+        with self.prefix_trees_dict_lock:
+            pending_drain = self.pending_task_drains.get(task_name)
+            if pending_drain is not None:
+                pending_drain_id, pending_env_ids = pending_drain
+                if pending_drain_id != drain_id:
+                    raise RuntimeError(
+                        f"Task '{task_name}' has pending drain "
+                        f"'{pending_drain_id}'"
+                    )
+                return list(pending_env_ids)
+
+            if (task_name, drain_id) in self.acknowledged_task_drains:
+                raise RuntimeError(
+                    f"Drain '{drain_id}' for task '{task_name}' "
+                    "was already acknowledged"
+                )
+
+            if task_name not in self.prefix_trees:
+                self.pending_task_drains[task_name] = (drain_id, ())
+                return []
+
+            root = self.prefix_trees[task_name]
+            tree_lock = self.prefix_tree_locks[task_name]
+
+            with tree_lock:
+                active_references = {
+                    env_id: reference_count
+                    for env_id, reference_count in (
+                        self.prefix_tree_env_refs[task_name].items()
+                    )
+                    if reference_count > 0
+                }
+                if active_references:
+                    raise RuntimeError(
+                        f"Cannot drain task '{task_name}' with active cache "
+                        f"reference(s): {active_references}"
+                    )
+
+                env_ids = list(
+                    dict.fromkeys(self._collect_subtree_env_ids(root))
+                )
+                root.children.clear()
+                root.env_id = None
+                root.value = None
+                root.tool_exec_time = None
+                root.init_time = int(time.time())
+                root.ttl = float("inf")
+                root.test_result = None
+                root.cache_hits = 0
+                root.prefix_hits = 0
+                root.stateless = False
+                self.prefix_tree_env_refs[task_name] = {}
+                self.prefix_tree_env_count[task_name] = 0
+
+                detached_env_ids = tuple(env_ids)
+                self.pending_task_drains[task_name] = (
+                    drain_id,
+                    detached_env_ids,
+                )
+                return list(detached_env_ids)
+
+    def ack_task_drain(self, task_name: str, drain_id: str) -> bool:
+        """Acknowledge ownership transfer for a completed task drain."""
+        if not isinstance(task_name, str) or not task_name:
+            raise ValueError("task_name must be a non-empty string")
+        if not isinstance(drain_id, str) or not drain_id:
+            raise ValueError("drain_id must be a non-empty string")
+
+        drain_key = (task_name, drain_id)
+        with self.prefix_trees_dict_lock:
+            if drain_key in self.acknowledged_task_drains:
+                return True
+
+            pending_drain = self.pending_task_drains.get(task_name)
+            if pending_drain is None:
+                raise RuntimeError(
+                    f"Task '{task_name}' has no pending drain"
+                )
+
+            pending_drain_id, _ = pending_drain
+            if pending_drain_id != drain_id:
+                raise RuntimeError(
+                    f"Task '{task_name}' has pending drain "
+                    f"'{pending_drain_id}', not '{drain_id}'"
+                )
+
+            del self.pending_task_drains[task_name]
+            self.acknowledged_task_drains.add(drain_key)
+            return True
 
     def _ttl_cleanup_worker(self):
         while not self.ttl_cleanup_stop_event.wait(timeout=self.ttl_cleanup_interval):

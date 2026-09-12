@@ -1,6 +1,7 @@
 import httpx
 import json
-from typing import Dict, Any
+import uuid
+from typing import Dict, Any, Optional
 
 
 class SandboxClient:
@@ -15,6 +16,7 @@ class SandboxClient:
         """
         self.base_url = base_url.rstrip('/')
         self.sandbox_id = None
+        self._stop_operation_ids: Dict[str, str] = {}
 
     async def _post(self, endpoint: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """Make a POST request to the server."""
@@ -23,9 +25,7 @@ class SandboxClient:
         timeout = httpx.Timeout(300.0, connect=10.0)
         async with httpx.AsyncClient(timeout=timeout) as client:
             response = await client.post(url, json=data)
-            if response.status_code != 200:
-                print(f'Response status is {response.status_code} for output = {response.json()}')
-            # response.raise_for_status()
+            response.raise_for_status()
             return response.json()
 
     async def start_sandbox(self, sandbox_id: str) -> Dict[str, Any]:
@@ -35,11 +35,57 @@ class SandboxClient:
         self.sandbox_id = sandbox_id
         return result
 
-    async def stop_sandbox(self, sandbox_id: str) -> Dict[str, Any]:
+    async def stop_sandbox(
+        self,
+        sandbox_id: str,
+        operation_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
         """Stop and remove a sandbox."""
+        if not isinstance(sandbox_id, str) or not sandbox_id:
+            raise ValueError("sandbox_id must be a non-empty string")
+
+        if operation_id is None:
+            operation_id = self._stop_operation_ids.setdefault(
+                sandbox_id,
+                uuid.uuid4().hex,
+            )
+        elif not isinstance(operation_id, str) or not operation_id:
+            raise ValueError("operation_id must be a non-empty string")
+        else:
+            existing_operation_id = self._stop_operation_ids.get(
+                sandbox_id
+            )
+            if (
+                existing_operation_id is not None
+                and existing_operation_id != operation_id
+            ):
+                raise ValueError(
+                    f"Sandbox '{sandbox_id}' already has stop operation "
+                    f"'{existing_operation_id}'"
+                )
+            self._stop_operation_ids[sandbox_id] = operation_id
 
         print(f'[SANDBOX]: Stopping: {sandbox_id}')
-        return await self._post('stop', {'sandbox_id': sandbox_id})
+        result = await self._post(
+            'stop',
+            {
+                'sandbox_id': sandbox_id,
+                'operation_id': operation_id,
+            },
+        )
+        if type(result["success"]) is not bool:
+            raise TypeError("Sandbox stop response 'success' must be boolean")
+        if not result["success"]:
+            raise RuntimeError("Sandbox server rejected stop operation")
+        if result["sandbox_id"] != sandbox_id:
+            raise RuntimeError(
+                "Sandbox stop response returned a mismatched sandbox_id"
+            )
+        if result["operation_id"] != operation_id:
+            raise RuntimeError(
+                "Sandbox stop response returned a mismatched operation_id"
+            )
+        return result
 
     async def execute(self, function_name: str, argument: str = '') -> Dict[str, Any]:
         """

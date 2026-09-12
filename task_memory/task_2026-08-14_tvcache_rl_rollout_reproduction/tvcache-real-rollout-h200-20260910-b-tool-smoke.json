@@ -1,0 +1,84 @@
+{
+  "sandbox_id": "tool-smoke-8b4d2222395541fd9fd3555fe640a5d0",
+  "video_id": "0c481667-9303-4f4a-b331-0b412aaafa2d",
+  "calls": [
+    {
+      "endpoint": "/start",
+      "command": null,
+      "status_code": 200,
+      "seconds": 0.022912354208528996,
+      "body": {
+        "sandbox_id": "tool-smoke-8b4d2222395541fd9fd3555fe640a5d0",
+        "sandbox_path": "/data/ycfeng/tmp/tvcache-real-rollout-20260909/sandboxes/tool-smoke-8b4d2222395541fd9fd3555fe640a5d0",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "load_video_into_sandbox",
+      "status_code": 200,
+      "seconds": 0.22444507014006376,
+      "body": {
+        "command": "load_video_into_sandbox",
+        "result": "Successfully loaded video into the sandbox",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "preprocess",
+      "status_code": 200,
+      "seconds": 144.423229906708,
+      "body": {
+        "command": "preprocess",
+        "result": "Preprocessing completed",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "caption_retrieval",
+      "status_code": 200,
+      "seconds": 0.6344481487758458,
+      "body": {
+        "command": "caption_retrieval",
+        "result": "\nThere are 90 segments in total, ranging from 0 to 89. Caption of segments from 0 to 1 is {0: '#C C draws on the drawing', 60: '#C C draws on the paper with the'}\n",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "segment_localization",
+      "status_code": 200,
+      "seconds": 2.114292692858726,
+      "body": {
+        "command": "segment_localization",
+        "result": "\nThere are 90 segments in total, ranging from 0 to 89. The most relevant segments are: {75: '#C C paints on the canvas with the pen in her right', 20: '#C C paints on the painting with the pen in her right', 21: '#C C draws on the painting', 0: '#C C draws on the drawing with a paint', 1: '#C C paints on the drawing'}.\n",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "visual_question_answering",
+      "status_code": 200,
+      "seconds": 17.331915298011154,
+      "body": {
+        "command": "visual_question_answering",
+        "result": "\nSegment description: The video is about a person painting a picture of a field on a wall.\nAnswer to the question: The person is painting a picture of a field on a wall.\n",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/stop",
+      "command": null,
+      "status_code": 200,
+      "seconds": 0.05124004231765866,
+      "body": {
+        "operation_id": "53b09ca234b944dda72dfef616c87ef9",
+        "sandbox_id": "tool-smoke-8b4d2222395541fd9fd3555fe640a5d0",
+        "success": true
+      }
+    }
+  ],
+  "status": "PASS"
+}

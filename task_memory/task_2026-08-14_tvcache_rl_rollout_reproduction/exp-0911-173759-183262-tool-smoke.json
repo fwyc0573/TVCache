@@ -1,0 +1,84 @@
+{
+  "sandbox_id": "tool-smoke-e749919837fd459386a27fe7d12c73ff",
+  "video_id": "0c481667-9303-4f4a-b331-0b412aaafa2d",
+  "calls": [
+    {
+      "endpoint": "/start",
+      "command": null,
+      "status_code": 200,
+      "seconds": 0.003747306764125824,
+      "body": {
+        "sandbox_id": "tool-smoke-e749919837fd459386a27fe7d12c73ff",
+        "sandbox_path": "/data/ycfeng/tmp/exp-0911-173759-183262/sandboxes/tool-smoke-e749919837fd459386a27fe7d12c73ff",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "load_video_into_sandbox",
+      "status_code": 200,
+      "seconds": 0.02256450615823269,
+      "body": {
+        "command": "load_video_into_sandbox",
+        "result": "Successfully loaded video into the sandbox",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "preprocess",
+      "status_code": 200,
+      "seconds": 119.04154520109296,
+      "body": {
+        "command": "preprocess",
+        "result": "Preprocessing completed",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "caption_retrieval",
+      "status_code": 200,
+      "seconds": 0.6251948103308678,
+      "body": {
+        "command": "caption_retrieval",
+        "result": "\nThere are 90 segments in total, ranging from 0 to 89. Caption of segments from 0 to 1 is {0: '#C C draws on the drawing', 60: '#C C draws on the paper with a paint'}\n",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "segment_localization",
+      "status_code": 200,
+      "seconds": 2.2086152266710997,
+      "body": {
+        "command": "segment_localization",
+        "result": "\nThere are 90 segments in total, ranging from 0 to 89. The most relevant segments are: {73: '#C C draws on the drawing board using a paint', 20: '#C C draws with the paintbrush on the drawing', 61: '#C C draws on the drawing with the paint', 2: '#C C draws the picture', 89: '#C C paints on the canvas with the paint brush in her right'}.\n",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "visual_question_answering",
+      "status_code": 200,
+      "seconds": 3.508256494998932,
+      "body": {
+        "command": "visual_question_answering",
+        "result": "\nSegment description: The video is about a person painting a picture of a field on a sheet of wax paper.\nAnswer to the question: The person is painting a picture of a field on a wall using a brush.\n",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/stop",
+      "command": null,
+      "status_code": 200,
+      "seconds": 0.010824600234627724,
+      "body": {
+        "operation_id": "89c8655137f446c98c37896504815e40",
+        "sandbox_id": "tool-smoke-e749919837fd459386a27fe7d12c73ff",
+        "success": true
+      }
+    }
+  ],
+  "status": "PASS"
+}

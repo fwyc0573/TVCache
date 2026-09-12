@@ -17,47 +17,95 @@ import numpy as np
 import base64
 import gc
 import threading
+from pathlib import Path
 from captioning import Captioning
+from runtime_config import MODEL_CONFIG, resolve_video_agent_path
 
 
 model_cfgs = {
-    'viclip-l-internvid-10m-flt': {
-        'size': 'l',
-        'pretrained': 'tool_models/viCLIP/ViClip-InternVid-10M-FLT.pth',
+    f'viclip-{MODEL_CONFIG.viclip_variant}-internvid-10m-flt': {
+        'size': MODEL_CONFIG.viclip_variant,
+        'pretrained': Path(MODEL_CONFIG.viclip_checkpoint),
     }
-
-}          
+}
 
 
 class ToolKit:
     # Shared class-level model instances to save GPU memory (1-2GB per instance)
     _shared_viclip = None
     _shared_tokenizer = None
+    _shared_model_path = None
     _model_lock = threading.Lock()  # Lock for thread-safe model inference
     _init_lock = threading.Lock()   # Lock for thread-safe initialization
 
     @classmethod
-    def _initialize_shared_model(cls):
+    def _initialize_shared_model(cls, model_dir: Path):
+        cfg = next(iter(model_cfgs.values()))
+        model_path = (model_dir / cfg['pretrained']).resolve()
+        if (
+            cls._shared_model_path is not None
+            and cls._shared_model_path != model_path
+        ):
+            raise RuntimeError(
+                "ToolKit shared model was initialized from a different "
+                f"path: {cls._shared_model_path}"
+            )
         if cls._shared_viclip is None:
             with cls._init_lock:
                 if cls._shared_viclip is None:
-                    cfg = model_cfgs['viclip-l-internvid-10m-flt']
-                    model = get_viclip(cfg['size'], cfg['pretrained'])
+                    cfg = next(iter(model_cfgs.values()))
+                    model = get_viclip(
+                        cfg['size'],
+                        os.fspath(model_path),
+                    )
                     assert(type(model)==dict and model['viclip'] is not None and model['tokenizer'] is not None)
                     cls._shared_viclip = model['viclip'].to("cuda")
                     cls._shared_tokenizer = model['tokenizer']
+                    cls._shared_model_path = model_path
 
-    def __init__(self, video_path, base_dir='preprocess', vqa_tool='videollava', use_reid=True, openai_api_key='your_openai_api_key', captioning: Captioning=None):
+    def __init__(
+        self,
+        video_path,
+        base_dir='preprocess',
+        vqa_tool='videollava',
+        use_reid=True,
+        captioning: Captioning=None,
+        videollava_runtime_dir=None,
+        model_dir=None,
+    ):
         self.video_path = video_path
         base_name = os.path.basename(video_path).replace(".mp4", "")
         self.video_dir = os.path.join(base_dir, base_name)
-        assert vqa_tool in ["videollava", "gpt-4v"]
+        if vqa_tool != "videollava":
+            raise ValueError("Only local Video-LLaVA VQA is supported")
         self.vqa_tool = vqa_tool
+        if self.vqa_tool == "videollava":
+            if videollava_runtime_dir is None:
+                raise ValueError(
+                    "videollava_runtime_dir is required for videollava"
+                )
+            runtime_dir = os.fspath(videollava_runtime_dir)
+            if not osp.isabs(runtime_dir) or not osp.isdir(runtime_dir):
+                raise NotADirectoryError(
+                    "videollava_runtime_dir must be an existing absolute "
+                    f"directory: {runtime_dir}"
+                )
+            self.videollava_runtime_dir = runtime_dir
         cap = cv2.VideoCapture(video_path)
         self.fps = round(cap.get(cv2.CAP_PROP_FPS))
         cap.release()
-        self.openai_api_key = openai_api_key
         self.captioning = captioning
+        self.model_dir = Path(
+            model_dir
+            if model_dir is not None
+            else resolve_video_agent_path("tool_models")
+        )
+        if not self.model_dir.is_absolute():
+            raise ValueError(f"model_dir must be absolute: {self.model_dir}")
+        if not self.model_dir.is_dir():
+            raise NotADirectoryError(
+                f"model_dir must reference a directory: {self.model_dir}"
+            )
 
         
         with open(osp.join(self.video_dir, 'captions.json')) as f:
@@ -65,10 +113,15 @@ class ToolKit:
         self.segments = list(captions.keys())
         self.captions = list(captions.values())
         self.segment_num = len(self.segments)
-        self.database = DataBase(video_path, base_dir=base_dir, use_reid=use_reid)
+        self.database = DataBase(
+            video_path,
+            base_dir=base_dir,
+            use_reid=use_reid,
+            model_dir=self.model_dir,
+        )
 
         # Initialize shared model if not already done, then reference it
-        self._initialize_shared_model()
+        self._initialize_shared_model(self.model_dir)
         self.viclip = self._shared_viclip
         self.tokenizer = self._shared_tokenizer
 
@@ -116,7 +169,11 @@ class ToolKit:
     def segment_localization(self, description, k=5):
         with open(osp.join(self.video_dir, 'segment_textual_embedding.pkl'), 'rb') as f:
             segment2textual_emb = pickle.load(f)
-        des2textual_emb = encode_sentences(sentence_list=[description], model_name='text-embedding-3-large')
+        des2textual_emb = encode_sentences(
+            sentence_list=[description],
+            model_name='clip',
+            model_dir=self.model_dir,
+        )
         textual_scores = compute_cosine_similarity(target_embedding=des2textual_emb, embedding_list=segment2textual_emb)
 
         # Explicitly delete large embedding array after use (can be 100MB-1GB)
@@ -160,8 +217,13 @@ class ToolKit:
         if segment_id not in range(self.segment_num):
             return f"Segment ID {segment_id} not in range 0-{self.segment_num-1}."
         client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        client.connect("tmp/vqa.sock")
-        content_file = 'tmp/content.pkl'
+        client.connect(
+            osp.join(self.videollava_runtime_dir, "vqa.sock")
+        )
+        content_file = osp.join(
+            self.videollava_runtime_dir,
+            "content.pkl",
+        )
         video_segment_path = osp.join(self.video_dir, f'segment_{segment_id}.mp4')
         print(f'video segment path: {video_segment_path}')
         if not osp.exists(video_segment_path):
@@ -209,83 +271,8 @@ class ToolKit:
         return ans
     
 
-    def gpt4v_VQA(self, question, segment_id):
-        if segment_id not in range(self.segment_num):
-            return f"Segment ID {segment_id} not in range 0-{self.segment_num-1}."
-        candidate_segments = []
-        for i in range(segment_id-1, segment_id+2):
-            if i < 0 or i > self.segment_num-1:
-                continue
-            candidate_segments.append(i)
-        image_start_frame = candidate_segments[0]*self.fps * 2
-        image_end_frame = (candidate_segments[-1]+1)*self.fps * 2
-        frame_interval = (image_end_frame-image_start_frame)//3
-        cap = cv2.VideoCapture(self.video_path)
-        target_frame_ids = []
-        for i in range(4):
-            target_frame_id = image_start_frame+i*frame_interval
-            target_frame_ids.append(target_frame_id)
-            cap.set(cv2.CAP_PROP_POS_FRAMES, target_frame_id)
-            success, frame = cap.read()
-            if not success:
-                frame = np.zeros([24, 24, 3])
-            image_path = osp.join(self.video_dir, f'frame_{target_frame_id}.jpg')
-            cv2.imwrite(image_path, frame)
-        def encode_image(image_path):
-            with open(image_path, "rb") as image_file:
-                tmp = image_file.read()
-            return base64.b64encode(tmp).decode('utf-8')
-        # Getting the base64 string
-        base64_images = []
-        for id in target_frame_ids:
-            image_path = osp.join(self.video_dir, f'frame_{id}.jpg')
-            base64_images.append(encode_image(image_path))
-
-        headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {self.openai_api_key}"
-        }
-        question = f"The images are sequential frames in a 6-second video. Please briefly describe what happened in the video then briefly provide the answer to the question '{question}'."
-        payload = {
-        "model": "gpt-4-vision-preview",
-        "messages": [
-            {
-            "role": "user",
-            "content": [
-                {
-                    "type": "text",
-                    "text": question
-                },
-                {
-                    "type": "image_url",
-                    "image_url": {"url": f"data:image/jpeg;base64,{base64_images[0]}",},
-                },
-                {
-                    "type": "image_url",
-                    "image_url": {"url": f"data:image/jpeg;base64,{base64_images[1]}",},
-                },
-                {
-                    "type": "image_url",
-                    "image_url": {"url": f"data:image/jpeg;base64,{base64_images[2]}",},
-                },
-                {
-                    "type": "image_url",
-                    "image_url": {"url": f"data:image/jpeg;base64,{base64_images[3]}",},
-                },
-            ]
-            }
-        ],
-        "max_tokens": 200
-        }
-        response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
-        return response.json()['choices'][0]['message']['content']
-    
-    
     def visual_question_answering(self, question, segment_id):
-        if self.vqa_tool == 'videollava':
-            return self.videollava_VQA(question=question, segment_id=segment_id)
-        elif self.vqa_tool == 'gpt-4v':
-            return self.gpt4v_VQA(question=question, segment_id=segment_id)
+        return self.videollava_VQA(question=question, segment_id=segment_id)
 
 
     def cleanup(self):
@@ -312,4 +299,3 @@ class ToolKit:
 
         # Force garbage collection (don't clear CUDA cache as shared model is still there)
         # gc.collect()
-

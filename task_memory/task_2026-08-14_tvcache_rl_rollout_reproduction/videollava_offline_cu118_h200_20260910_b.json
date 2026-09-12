@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "python": "3.10.20 (main, May 10 2026, 19:27:29) [Clang 22.1.3 ]",
+  "torch": "2.0.1+cu118",
+  "cuda_build": "11.8",
+  "cuda_zeros_sum": 0.0,
+  "gpu": "NVIDIA H200",
+  "seconds": 382.0911647360772,
+  "allocated_bytes": 5408568320,
+  "peak_allocated_bytes": 5408568320,
+  "context_length": 2048,
+  "tokenizer_length": 32000,
+  "four_bit": true,
+  "image_tower_loaded": true,
+  "video_tower_loaded": true
+}

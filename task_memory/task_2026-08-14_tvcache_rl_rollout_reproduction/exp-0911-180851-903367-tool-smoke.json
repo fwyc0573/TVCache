@@ -1,0 +1,84 @@
+{
+  "sandbox_id": "tool-smoke-44d407d1633b47819ed405359d1606d9",
+  "video_id": "0c481667-9303-4f4a-b331-0b412aaafa2d",
+  "calls": [
+    {
+      "endpoint": "/start",
+      "command": null,
+      "status_code": 200,
+      "seconds": 0.003514152020215988,
+      "body": {
+        "sandbox_id": "tool-smoke-44d407d1633b47819ed405359d1606d9",
+        "sandbox_path": "/data/ycfeng/tmp/exp-0911-180851-903367/sandboxes/tool-smoke-44d407d1633b47819ed405359d1606d9",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "load_video_into_sandbox",
+      "status_code": 200,
+      "seconds": 0.021967552602291107,
+      "body": {
+        "command": "load_video_into_sandbox",
+        "result": "Successfully loaded video into the sandbox",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "preprocess",
+      "status_code": 200,
+      "seconds": 118.41553238965571,
+      "body": {
+        "command": "preprocess",
+        "result": "Preprocessing completed",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "caption_retrieval",
+      "status_code": 200,
+      "seconds": 0.556358452886343,
+      "body": {
+        "command": "caption_retrieval",
+        "result": "\nThere are 90 segments in total, ranging from 0 to 89. Caption of segments from 0 to 1 is {0: '#C C draws on the drawing', 60: '#C C draws on the drawing'}\n",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "segment_localization",
+      "status_code": 200,
+      "seconds": 1.9311265032738447,
+      "body": {
+        "command": "segment_localization",
+        "result": "\nThere are 90 segments in total, ranging from 0 to 89. The most relevant segments are: {71: '#C C draws on the painting', 28: '#C C draws on the painting', 31: '#C C draws on the painting', 19: '#C C draws on the painting with the paint', 21: '#C C draws on the painting'}.\n",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/execute",
+      "command": "visual_question_answering",
+      "status_code": 200,
+      "seconds": 4.22466872446239,
+      "body": {
+        "command": "visual_question_answering",
+        "result": "\nSegment description: The video is about a person painting a picture of a field on a wall. The person is seen using a brush to paint the picture, and the video ends with the person finishing the painting.\nAnswer to the question: The person is painting a picture of a field on a piece of paper.\n",
+        "success": true
+      }
+    },
+    {
+      "endpoint": "/stop",
+      "command": null,
+      "status_code": 200,
+      "seconds": 0.01145998015999794,
+      "body": {
+        "operation_id": "4dca71c17be9424aae65258d70031d08",
+        "sandbox_id": "tool-smoke-44d407d1633b47819ed405359d1606d9",
+        "success": true
+      }
+    }
+  ],
+  "status": "PASS"
+}

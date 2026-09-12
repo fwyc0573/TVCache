@@ -78,7 +78,10 @@ def test_sandbox_manager():
 
     if choice == 'y':
         try:
-            manager.stop_sandbox(sandbox_id)
+            manager.stop_sandbox(
+                sandbox_id,
+                operation_id=f"test-cleanup:{sandbox_id}",
+            )
             print(f"   ✓ Sandbox '{sandbox_id}' stopped and removed")
             print(f"   ✓ Sandbox exists: {manager.sandbox_exists(sandbox_id)}")
         except Exception as e:

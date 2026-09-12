@@ -1,5 +1,9 @@
 import sys
-sys.path.insert(0, 'LaViLa/')
+from pathlib import Path
+
+from runtime_config import resolve_video_agent_path
+
+sys.path.insert(0, str(resolve_video_agent_path("LaViLa")))
 import os
 import urllib.request
 from collections import OrderedDict
@@ -9,7 +13,7 @@ import torch
 import torchvision.transforms as transforms
 import torchvision.transforms._transforms_video as transforms_video
 from LaViLa.lavila.data.video_transforms import Permute
-from LaViLa.lavila.models.models import VCLM_OPENAI_TIMESFORMER_LARGE_336PX_GPT2_XL
+from LaViLa.lavila.models import models as lavila_models
 from LaViLa.lavila.models.tokenizer import MyGPT2Tokenizer
 from LaViLa.eval_narrator import decode_one
 import json
@@ -17,22 +21,39 @@ import cv2
 from typing import Dict
 from threading import Lock
 import base64
-from openai import OpenAI
+from runtime_config import MODEL_CONFIG
 
 
 
 class Captioning:
-    def __init__(self, video_path_list, base_dir='preprocess'):
+    def __init__(
+        self,
+        video_path_list,
+        base_dir='preprocess',
+        model_dir=None,
+    ):
         self.video_path_list = video_path_list
         self.seconds_per_caption = 2 # a caption covers 2 seconds
         self.frames_per_caption = 4 # a caption is generated from 4 frames in the 2-second segments
         self.base_dir = base_dir
+        self.model_dir = Path(
+            model_dir
+            if model_dir is not None
+            else resolve_video_agent_path("tool_models")
+        )
+        if not self.model_dir.is_absolute():
+            raise ValueError(f"model_dir must be absolute: {self.model_dir}")
+        if not self.model_dir.is_dir():
+            raise NotADirectoryError(
+                f"model_dir must reference a directory: {self.model_dir}"
+            )
+        (self.model_dir / "LaViLa").mkdir(parents=True, exist_ok=True)
         start_time = time.time()
         print("=" * 60)
         print("CAPTIONING MODEL LOADING - DETAILED TIMING")
         print("=" * 60)
 
-        crop_size = 336
+        crop_size = MODEL_CONFIG.lavila_crop_size
         self.val_transform = transforms.Compose([
             Permute([3, 0, 1, 2]),
             transforms.Resize(crop_size),
@@ -42,11 +63,14 @@ class Captioning:
 
         # Step 1: Load checkpoint from disk
         t1 = time.time()
-        ckpt_name = 'vclm_openai_timesformer_large_336px_gpt2_xl.pt_ego4d.jobid_246897.ep_0003.md5sum_443263.pth'
-        ckpt_path = os.path.join('tool_models/LaViLa/', ckpt_name)
+        ckpt_name = MODEL_CONFIG.lavila_checkpoint
+        ckpt_path = self.model_dir / "LaViLa" / ckpt_name
         if not os.path.exists(ckpt_path):
             print('downloading model to {}'.format(ckpt_path))
-            urllib.request.urlretrieve('https://dl.fbaipublicfiles.com/lavila/checkpoints/narrator/{}'.format(ckpt_name), ckpt_path)
+            urllib.request.urlretrieve(
+                'https://dl.fbaipublicfiles.com/lavila/checkpoints/narrator/{}'.format(ckpt_name),
+                os.fspath(ckpt_path),
+            )
         ckpt = torch.load(ckpt_path, map_location='cpu')
         t2 = time.time()
         print(f'[1/6] Loading checkpoint from disk: {round(t2-t1, 3)} seconds')
@@ -59,10 +83,13 @@ class Captioning:
         print(f'[2/6] Creating state_dict: {round(t3-t2, 3)} seconds')
 
         # Step 3: Instantiate the model
-        self.model = VCLM_OPENAI_TIMESFORMER_LARGE_336PX_GPT2_XL(
+        model_constructor = getattr(lavila_models, MODEL_CONFIG.lavila_constructor)
+        self.model = model_constructor(
             text_use_cls_token=False,
             project_embed_dim=256,
             gated_xattn=True,
+            random_init_gpt2=MODEL_CONFIG.lavila_random_init_dependencies,
+            random_init_visual=MODEL_CONFIG.lavila_random_init_dependencies,
             timesformer_gated_xattn=False,
             freeze_lm_vclm=False,      # we use model.eval() anyway
             freeze_visual_vclm=False,  # we use model.eval() anyway
@@ -90,17 +117,22 @@ class Captioning:
         print(f'Captioning Model Size: {model_size_mb:.2f} MB')
 
         # Step 7: Load tokenizer
-        self.tokenizer = MyGPT2Tokenizer('gpt2-xl', add_bos=True)
+        tokenizer_path = self.model_dir / MODEL_CONFIG.lavila_tokenizer
+        if not tokenizer_path.is_dir():
+            raise NotADirectoryError(
+                f"LaViLa tokenizer directory is required: {tokenizer_path}"
+            )
+        self.tokenizer = MyGPT2Tokenizer(str(tokenizer_path), add_bos=True)
         end_time = time.time()
         print(f'[6/6] Loading tokenizer: {round(end_time-t6, 3)} seconds')
         print(f'Total time for loading captioning model: {round(end_time-start_time, 3)} seconds')
         print("=" * 60)
 
         self.model_lock = Lock()
-        self.client: OpenAI = OpenAI()
-
         self.captioning_prompt = ''
-        with open('./captioning_prompt.txt', 'r') as prompt_file:
+        with resolve_video_agent_path("captioning_prompt.txt").open(
+            "r"
+        ) as prompt_file:
             self.captioning_prompt = prompt_file.read()
 
     def get_captions_from_frames(self, frames: torch.Tensor) -> str:
@@ -160,40 +192,26 @@ class Captioning:
             skipped += 1
 
         
-        frames = []
+        captions_per_segment = max(1, int(round(fps * seconds_per_caption)))
+        frame_interval = max(1, captions_per_segment // subset_frames_per_caption)
+        for caption_start in range(0, total_frames, captions_per_segment):
+            frames = []
+            for offset in range(0, captions_per_segment, frame_interval):
+                cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame_idx + caption_start + offset)
+                success, frame = cap.read()
+                if not success:
+                    raise RuntimeError("failed to read a frame for local captioning")
+                if hasattr(frame, "shape") and len(frame.shape) >= 2:
+                    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                frames.append(torch.tensor(frame, dtype=torch.float32))
+            frame_tensor = torch.stack(frames, dim=0)
+            frame_tensor = self.val_transform(frame_tensor).unsqueeze(0)
+            caption_dict[start_frame_idx + caption_start] = self.get_captions_from_frames(
+                frame_tensor
+            )
 
-        for i in range(total_frames):
-            success, frame = cap.read()
-            _, buffer = cv2.imencode(".jpg", frame)
-            frames.append(base64.b64encode(buffer).decode("utf-8"))
-            
-        response = self.client.chat.completions.create(
-                    model="gpt-4.1-mini",  # or "gpt-4o" for higher quality
-                    messages=[
-                            {
-                                "role": "user",
-                                "content": [
-                                    {
-                                        "type": "text",
-                                        "text": self.captioning_prompt
-                                    },
-                                    *[
-                                        {
-                                            "type": "image_url",
-                                            "image_url": {
-                                                "url": f"data:image/jpeg;base64,{frame}"
-                                            }
-                                        }
-                                        for frame in frames[0::25]
-                                    ]
-                                ]
-                            }
-                        ],
-                    )
-
-        # print(response.choices[0].message.content)
-        
-        return response.choices[0].message.content, response.usage.prompt_tokens, response.usage.completion_tokens
+        cap.release()
+        return caption_dict, 0, 0
         # for caption_id in range(total_captions):
         #     frames = []
             

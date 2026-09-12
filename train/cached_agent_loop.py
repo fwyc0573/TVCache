@@ -2,7 +2,10 @@ from typing import Dict, List, Optional
 from tinker import SamplingClient
 from tool_schema import Response
 from utils.video_sandbox_client import SandboxClient
+from pathlib import Path
+from tinker_cookbook.completers import TokensWithLogprobs
 from tinker_cookbook.renderers import Renderer
+from tinker_cookbook.rl.types import Trajectory, Transition
 from threading import Lock
 import json
 import time
@@ -44,7 +47,8 @@ class CachedVideoAgentLoop:
                  num_turns: int,
                  renderer: Renderer,
                  shared_cache: SharedToolCache,
-                 sandbox_base_url: str = "http://localhost:5000"):
+                 sandbox_base_url: str = "http://localhost:5000",
+                 rollout_log_dir: str = "./rollouts"):
 
         self.q = training_data_point['question']
         self.answer = training_data_point['answer']
@@ -56,15 +60,27 @@ class CachedVideoAgentLoop:
         self.final_answer = None
         self.invalid_parse = False
         self.shared_cache = shared_cache
+        self._stats = {
+            "total_calls": 0,
+            "exact_hits": 0,
+            "prefix_hits": 0,
+            "cache_misses": 0,
+            "tool_executions": 0,
+            "environment_forks": 0,
+            "cache_puts": 0,
+        }
 
         # Create sandbox client
         self.sandbox_client = SandboxClient(base_url=sandbox_base_url)
         self.sandbox_id = None
         self.log_file_path = None
+        self.rollout_log_dir = rollout_log_dir
 
     async def start_sandbox(self, sandbox_id: str):
         self.sandbox_id = sandbox_id
-        self.log_file_path = f'./rollouts/{sandbox_id}.log'
+        rollout_log_dir = Path(self.rollout_log_dir)
+        rollout_log_dir.mkdir(parents=True, exist_ok=True)
+        self.log_file_path = str(rollout_log_dir / f"{sandbox_id}.log")
         return await self.sandbox_client.start_sandbox(sandbox_id)
 
     async def stop_sandbox(self):
@@ -76,7 +92,7 @@ class CachedVideoAgentLoop:
             log_file.write(log_line)
             log_file.write('\n')
 
-    async def run(self, sampling_params) -> tuple[List[int], List[float]]:
+    async def run(self, sampling_params) -> Trajectory:
         """
         Run the agent loop for multiple turns.
 
@@ -84,18 +100,12 @@ class CachedVideoAgentLoop:
             sampling_params: Parameters for sampling from the model
 
         Returns:
-            all_tokens: List of all tokens (prompt + completions) across all turns
-            all_logprobs: List of logprobs with masking (0.0 for prompt/tool messages, actual logprobs for assistant messages)
+            A transition-aware trajectory for Tinker RL data assembly.
         """
-        all_tokens = []
-        all_logprobs = []
-        advantage_mask = []
+        transitions: list[Transition] = []
 
         for turn in range(self.num_turns):
-            prev_len = len(all_tokens)
-
             model_input = self.renderer.build_generation_prompt(self.messages)
-            prompt_tokens = model_input.to_ints()
 
             self.log(f'=============Starting turn {turn}=============')
             for message in self.messages:
@@ -118,24 +128,20 @@ class CachedVideoAgentLoop:
             sampled_logprobs = sample_result.sequences[0].logprobs
             assert sampled_logprobs is not None, "Logprobs must be enabled in sampling"
 
-            # Calculate new tokens added in this turn (tool responses from previous turn)
-            new_prompt_tokens = prompt_tokens[prev_len - 1:]
-            all_tokens = prompt_tokens + sampled_tokens
-
-            # Update logprobs: mask prompt/tool tokens (0.0), keep assistant token logprobs
-            if turn == 0:
-                all_logprobs = [0.0] * (len(prompt_tokens) - 1) + list(sampled_logprobs)
-                advantage_mask = [0.0] * (len(prompt_tokens) - 1) + [1.0] * len(sampled_logprobs)
-            else:
-                all_logprobs += [0.0] * (len(new_prompt_tokens) - 1) + list(sampled_logprobs)
-                advantage_mask += [0.0] * (len(new_prompt_tokens) - 1) + [1.0] * len(sampled_logprobs)
+            transition = Transition(
+                ob=model_input,
+                ac=TokensWithLogprobs(
+                    tokens=list(sampled_tokens),
+                    maybe_logprobs=list(sampled_logprobs),
+                ),
+                reward=0.0,
+                episode_done=False,
+            )
+            transitions.append(transition)
 
             parsed_message, _ = self.renderer.parse_response(sampled_tokens)
 
             self.log(f'Parsed message {parsed_message["content"]}')
-            self.log(f"Log probs must always be 1 less than tokens but seeing token len = {len(all_tokens)} logprobs len = {len(all_logprobs)}")
-
-            assert len(all_tokens) == len(all_logprobs) + 1, f"Log probs must always be 1 less than tokens but seeing token len = {len(all_tokens)} logprobs len = {len(all_logprobs)}"
 
             try:
                 response = Response.model_validate_json(parsed_message["content"])
@@ -143,52 +149,74 @@ class CachedVideoAgentLoop:
                 self.log(f'[PARSE-ERROR]: Failed to parse response as Response schema: {e}')
                 self.log(f'[PARSE-ERROR]: Raw content: {parsed_message["content"]}')
                 self.invalid_parse = True
+                transition.episode_done = True
                 break
 
             self.messages.append(parsed_message)
 
             if response.final_answer is not None:
                 self.final_answer = response.final_answer
+                transition.episode_done = True
                 break
 
             for action in response.actions:
-                try:
+                function_name = action.tool
+                argument = action.inputs
 
-                    function_name = action.tool
-                    argument = action.inputs
+                self.log(f'Calling tool {function_name} with arguments {argument}')
+                self._stats["total_calls"] += 1
 
-                    self.log(f'Calling tool {function_name} with arguments {argument}')
+                cached_result = self.shared_cache.get(function_name, argument)
 
-                    # Check cache first
-                    cached_result = self.shared_cache.get(function_name, argument)
+                if cached_result is not None:
+                    self._stats["exact_hits"] += 1
+                    self.log(f'[CACHE-HIT]: {function_name} with {argument}')
+                    tool_result = (
+                        f"Result of calling {function_name} with {argument} "
+                        f"as argument is {cached_result}"
+                    )
+                else:
+                    self._stats["cache_misses"] += 1
+                    self._stats["tool_executions"] += 1
+                    self.log(f'[CACHE-MISS]: {function_name} with {argument}')
 
-                    if cached_result is not None:
-                        self.log(f'[CACHE-HIT]: {function_name} with {argument}')
-                        tool_result = f"Result of calling {function_name} with {argument} as argument is {cached_result}"
-                    else:
-                        self.log(f'[CACHE-MISS]: {function_name} with {argument}')
+                    st = time.perf_counter()
+                    result = await self.sandbox_client.execute(
+                        function_name,
+                        argument,
+                    )
+                    et = time.perf_counter()
 
-                        st = time.perf_counter()
-                        result = await self.sandbox_client.execute(function_name, argument)
-                        et = time.perf_counter()
+                    self.log(
+                        f'[TOOL-TIME]: Time taken to call {function_name} '
+                        f'with {argument}: {et - st} seconds'
+                    )
 
-                        self.log(f'[TOOL-TIME]: Time taken to call {function_name} with {argument}: {et - st} seconds')
-
-                        if 'result' in result:
-                            self.shared_cache.put(function_name, argument, result['result'])
-                            tool_result = f"Result of calling {function_name} with {argument} as argument is {result['result']}"
-                        else:
-                            tool_result = f"Failed to execute {function_name} with {argument}. There was an error calling the {function_name}"
-
-                except Exception as e:
-                    import traceback
-                    tool_result = f"Tool: {action.tool} failed to execute, there was an error."
-                    self.log(traceback.format_exc())
-
+                    tool_value = result['result']
+                    self.shared_cache.put(
+                        function_name,
+                        argument,
+                        tool_value,
+                    )
+                    self._stats["cache_puts"] += 1
+                    tool_result = (
+                        f"Result of calling {function_name} with {argument} "
+                        f"as argument is {tool_value}"
+                    )
 
                 self.messages.append({"role": "tool", "content": tool_result})
 
-        return all_tokens, all_logprobs, advantage_mask
+            if turn == self.num_turns - 1:
+                transition.episode_done = True
+
+        final_observation = self.renderer.build_generation_prompt(self.messages)
+        return Trajectory(
+            transitions=transitions,
+            final_ob=final_observation,
+        )
+
+    def get_stats(self) -> dict[str, int]:
+        return self._stats.copy()
 
     def get_reward(self) -> float:
         if self.invalid_parse:
