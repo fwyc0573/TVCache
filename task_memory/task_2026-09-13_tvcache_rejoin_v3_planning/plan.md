@@ -17,7 +17,7 @@ The user has authorized execution. P00 and P01 are complete; P02 is the active p
 | P00 baseline capture | complete | `p00_baseline/baseline.md`, `environment.md`, and raw pytest logs. |
 | P01 cursor issue lock | complete | B01 strict `xfail`, forced failure evidence, and `issues.md`; commits `cce8520`, `30ff78f`. |
 | P02 minimal research harness | complete | `research/rejoin/` package, direct execution support, JSONL trace, manifest analysis, and smoke evidence are complete. |
-| P03 cohort/tool surface | pending | Depends on P02 smoke acceptance. |
+| P03 cohort/tool surface | pending | P02 is complete; a read-only audit found no approved W1 task manifest or image metadata in the checkout. |
 | P04 API rollout collector | pending | Depends on P02 and P03. |
 | P05 opportunity pilot | pending | Depends on P04 smoke gate. |
 | P06 decision | pending | Depends on P05 analysis. |

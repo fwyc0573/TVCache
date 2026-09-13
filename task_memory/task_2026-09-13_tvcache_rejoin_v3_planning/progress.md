@@ -48,3 +48,9 @@
 ## Next decision
 
 P02 is complete. P03 may now freeze the W1 cohort and S0/S1 tool surface. P04 collector preparation may proceed in parallel, but real provider execution remains gated by P03 inputs and the documented smoke gate.
+
+## P03 audit
+
+- Read-only inventory found no approved W1 manifest containing task IDs, source revisions, image digests, task roots, and verifiers.
+- The existing EgoSchema manifest is a video asset record and cannot serve as the W1 filesystem cohort.
+- P03 remains pending until the missing task and runtime metadata are supplied. No provider, GPU, Docker, or serving execution was started.
