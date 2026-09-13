@@ -8,7 +8,7 @@
 
 ## Current status
 
-The user has authorized execution. P00 and P01 are complete; P02 is the active packet. The source of truth remains `draft-plan/TVCache_ReJoin_Codex_Plan_v3_ZH.md`, originally pinned at `43cf9d6a779eb5149e0fae50b9a3a891dcbaed6f`; the current checkout includes the P01 evidence commit.
+The user has authorized execution. P00, P01, and P02 are complete; P03 is pending its missing W1 task manifest and runtime metadata. The source of truth remains `draft-plan/TVCache_ReJoin_Codex_Plan_v3_ZH.md`, originally pinned at `43cf9d6a779eb5149e0fae50b9a3a891dcbaed6f`; the current checkout includes the execution evidence commits.
 
 ## Execution status
 
