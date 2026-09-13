@@ -1,3 +1,9 @@
+## Modification History
+
+| Date       | Summary of Changes |
+| ---------- | ------------------ |
+| 2026-09-13 | Recorded the ten-task W1 candidate cohort and four-task smoke subset. |
+
 # ReJoin W1 Pilot Cohort Selection
 
 - Source: `harbor-framework/terminal-bench-1`

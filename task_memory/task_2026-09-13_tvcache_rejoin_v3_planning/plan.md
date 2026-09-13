@@ -17,7 +17,7 @@ The user has authorized execution. P00, P01, and P02 are complete; P03 is pendin
 | P00 baseline capture | complete | `p00_baseline/baseline.md`, `environment.md`, and raw pytest logs. |
 | P01 cursor issue lock | complete | B01 strict `xfail`, forced failure evidence, and `issues.md`; commits `cce8520`, `30ff78f`. |
 | P02 minimal research harness | complete | `research/rejoin/` package, direct execution support, JSONL trace, manifest analysis, and smoke evidence are complete. |
-| P03 cohort/tool surface | in-progress | W1 cohort and pinned Terminal-Bench source are ready; image builds are pending because this host has no container runtime. |
+| P03 cohort/tool surface | in-progress | W1 cohort, pinned Terminal-Bench source, and local eight-tool surface are ready; image builds and verifier runs are pending because this host has no container runtime. |
 | P04 API rollout collector | pending | Depends on P02 and P03. |
 | P05 opportunity pilot | pending | Depends on P04 smoke gate. |
 | P06 decision | pending | Depends on P05 analysis. |

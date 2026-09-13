@@ -22,6 +22,8 @@ The v3 Chinese ReJoin plan was read in full and converted into a durable executi
 - P03 cohort audit: [`p03_cohort_audit.md`](p03_cohort_audit.md)
 - P03 audit report: [`test_report_2026-09-13_p03_cohort_audit.md`](test_report_2026-09-13_p03_cohort_audit.md)
 - P03 source pin and runtime status: [`p03_source_pin.md`](p03_source_pin.md)
+- P03 tool surface report: [`test_report_2026-09-13_p03_tool_surface.md`](test_report_2026-09-13_p03_tool_surface.md)
+- P03 runtime readiness report: [`test_report_2026-09-13_p03_runtime_readiness.md`](test_report_2026-09-13_p03_runtime_readiness.md)
 - Read-only document validation: [`test_report_2026-09-13_plan_document_validation.md`](test_report_2026-09-13_plan_document_validation.md)
 - Planning skill index: [`task_plan.md`](../../task_2026-09-13_tvcache_rejoin_v3_planning/task_plan.md)
 
