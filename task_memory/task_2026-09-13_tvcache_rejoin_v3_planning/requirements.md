@@ -24,6 +24,10 @@
 - Do not modify TVCache serving code or start GPU jobs before the M0/M1 gates authorize that work.
 - CPU tests, research harness code, trace collection, and task-memory evidence are now in scope when required by P00–P05.
 
+## Latest follow-up
+
+用户已提供第一版 W1 filesystem task selection 和 candidate manifest，并指定下一步为：checkout/pin Terminal-Bench source；构建十个 task image 并填 runtime digest；验证 verifier；实现 seven S0 plus one S1 tool surface；使用四个 task 启动 P04 smoke。当前主机缺少 container runtime，因此 image build 和 in-container verifier 执行需在 runtime 可用后继续。
+
 ## Acceptance Criteria
 
 - The new task directory is present under `task_memory/`.

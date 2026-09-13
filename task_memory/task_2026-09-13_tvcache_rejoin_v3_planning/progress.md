@@ -54,3 +54,15 @@ P02 is complete. P03 may now freeze the W1 cohort and S0/S1 tool surface. P04 co
 - Read-only inventory found no approved W1 manifest containing task IDs, source revisions, image digests, task roots, and verifiers.
 - The existing EgoSchema manifest is a video asset record and cannot serve as the W1 filesystem cohort.
 - P03 remains pending until the missing task and runtime metadata are supplied. No provider, GPU, Docker, or serving execution was started.
+
+## P03 continuation: source and runtime readiness
+
+- Read and accepted the ten-task W1 candidate manifest and four-task smoke subset supplied by the user.
+- Checked out `harbor-framework/terminal-bench-1` at `d28711d0da2675d0bb1d56de45ae5df6082438a3` under `/data/ycfeng/tmp/terminal-bench-1-d28711d0da2675d0bb1d56de45ae5df6082438a3`; detached checkout has no local edits.
+- Verified every selected task has a Dockerfile and `run-tests.sh`; all ten verifier scripts pass `bash -n`.
+- Image digests are still null by design. The host has no Docker-compatible executable or `/var/run/docker.sock`, so image build, digest capture, and in-container verifier execution cannot proceed here.
+- Deleted only task-generated Python caches and old P00/P02 temporary directories that are not needed for later evidence. Pinned Terminal-Bench source and required task memory records were retained.
+
+## Next decision
+
+P03 source pinning is complete. Continue with the seven S0 plus one mutating S1 tool surface while waiting for a supported container runtime; do not start P04 smoke until the four smoke image digests and verifier results are available.

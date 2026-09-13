@@ -21,6 +21,7 @@ The v3 Chinese ReJoin plan was read in full and converted into a durable executi
 - P02 validation report: [`test_report_2026-09-13_p02_harness.md`](test_report_2026-09-13_p02_harness.md)
 - P03 cohort audit: [`p03_cohort_audit.md`](p03_cohort_audit.md)
 - P03 audit report: [`test_report_2026-09-13_p03_cohort_audit.md`](test_report_2026-09-13_p03_cohort_audit.md)
+- P03 source pin and runtime status: [`p03_source_pin.md`](p03_source_pin.md)
 - Read-only document validation: [`test_report_2026-09-13_plan_document_validation.md`](test_report_2026-09-13_plan_document_validation.md)
 - Planning skill index: [`task_plan.md`](../../task_2026-09-13_tvcache_rejoin_v3_planning/task_plan.md)
 
@@ -30,4 +31,4 @@ PASS. The source file was confirmed at 1,310 lines. P00 recorded the CPU baselin
 
 # Open Items / Future Extensions
 
-P03 is pending an approved W1 manifest with 8–12 task IDs, source revisions, image digests, task roots, and verifiers. Future execution must also choose an authorized API endpoint, define two concrete W2-T1 instances, and decide where raw pilot artifacts are stored. These inputs are intentionally not fabricated here.
+P03 source pinning is complete with ten selected W1 tasks and a four-task smoke subset. Runtime image digests and in-container verifier results are pending because the current host has no container runtime. Future execution must also choose an authorized API endpoint, define two concrete W2-T1 instances, and decide where raw pilot artifacts are stored.

@@ -17,7 +17,7 @@ The user has authorized execution. P00, P01, and P02 are complete; P03 is pendin
 | P00 baseline capture | complete | `p00_baseline/baseline.md`, `environment.md`, and raw pytest logs. |
 | P01 cursor issue lock | complete | B01 strict `xfail`, forced failure evidence, and `issues.md`; commits `cce8520`, `30ff78f`. |
 | P02 minimal research harness | complete | `research/rejoin/` package, direct execution support, JSONL trace, manifest analysis, and smoke evidence are complete. |
-| P03 cohort/tool surface | pending | P02 is complete; a read-only audit found no approved W1 task manifest or image metadata in the checkout. |
+| P03 cohort/tool surface | in-progress | W1 cohort and pinned Terminal-Bench source are ready; image builds are pending because this host has no container runtime. |
 | P04 API rollout collector | pending | Depends on P02 and P03. |
 | P05 opportunity pilot | pending | Depends on P04 smoke gate. |
 | P06 decision | pending | Depends on P05 analysis. |
@@ -76,6 +76,8 @@ research/rejoin/
 **Work:** choose 8–12 W1 tasks; record task ID, source revision, image digest, include/exclude reason, verifier, and task root. Implement seven S0 tools plus mutating S1 `exec`.
 
 **Acceptance:** each tool declares its mutation behavior; S0 facts are serializable; S1 has no dependency classifier; task selection is reviewable.
+
+**Current execution:** the ten-task candidate manifest and four-task smoke subset are recorded in `rejoin_w1_candidate_manifest.jsonl` and `rejoin_w1_cohort_selection.md`. The source checkout is pinned and verified in `p03_source_pin.md`. Runtime image digests and in-container verifier results remain pending.
 
 ### P04 — API rollout collector
 
