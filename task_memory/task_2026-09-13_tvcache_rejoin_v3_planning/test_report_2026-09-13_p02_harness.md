@@ -61,4 +61,4 @@ PASS — `analyze.py` reloaded all three JSONL events and reported:
 }
 ```
 
-The first event changed `src/input.txt`; the two read-only events preserved the same before and after manifest digest. Each trace event contains `canonical_args`, timing, result digest, and before/after workspace digest. This check establishes local harness behavior only; it does not establish API rollout behavior or any ReJoin opportunity class.
+The first event changed `src/input.txt`; the two read-only events preserved the same before and after manifest digest. Each trace event contains normalized arguments, timing, result digest, and before/after workspace digest. This check establishes local harness behavior only; it does not establish API rollout behavior or any ReJoin opportunity class.

@@ -4,12 +4,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping, Protocol
+from typing import Any, Mapping
 
 
-class ToolExecutor(Protocol):
+class ToolExecutor:
     def execute(self, tool_name: str, arguments: Mapping[str, Any]) -> Any:
-        ...
+        raise NotImplementedError
 
 
 @dataclass

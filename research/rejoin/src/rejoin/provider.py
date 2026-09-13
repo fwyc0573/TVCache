@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from typing import Any, Mapping, Protocol, Sequence
+from typing import Any, Mapping, Sequence
 
 
-class CompletionProvider(Protocol):
+class CompletionProvider:
     def complete(self, messages: Sequence[Mapping[str, Any]]) -> str:
-        ...
+        raise NotImplementedError
 
 
 class ScriptedProvider:

@@ -1,0 +1,192 @@
+   Building tvclient @ file:///data/ycfeng/step-sandbox/TVCache/.worktrees/yc-sandbox/tvcache/client
+Downloading pygments (1.2MiB)
+ Downloaded pygments
+      Built tvclient @ file:///data/ycfeng/step-sandbox/TVCache/.worktrees/yc-sandbox/tvcache/client
+Installed 27 packages in 15ms
+.................................................................F...... [ 38%]
+..............F......................................................... [ 76%]
+.....................E...............x......                             [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_on_demand_captioning_uses_local_lavila_and_zero_api_tokens _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f82134f1fc0>
+
+    @pytest.fixture
+    def captioning_module(
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> ModuleType:
+        torch_module = ModuleType("torch")
+        torch_module.Tensor = FakeTensor
+        torch_module.float32 = object()
+        torch_module.tensor = lambda value, dtype: FakeTensor(value)
+        torch_module.stack = (
+            lambda tensors, dim: FakeTensor([tensor.value for tensor in tensors])
+        )
+    
+        transforms_module = ModuleType("torchvision.transforms")
+        transforms_module.Compose = lambda transforms: lambda value: value
+        transforms_module.Resize = lambda size: object()
+        transforms_module.CenterCrop = lambda size: object()
+        video_transforms_module = ModuleType(
+            "torchvision.transforms._transforms_video"
+        )
+        video_transforms_module.NormalizeVideo = lambda **kwargs: object()
+        torchvision_module = ModuleType("torchvision")
+        torchvision_module.transforms = transforms_module
+    
+        video_transform_module = ModuleType(
+            "LaViLa.lavila.data.video_transforms"
+        )
+        video_transform_module.Permute = lambda order: object()
+        models_module = ModuleType("LaViLa.lavila.models.models")
+        models_module.VCLM_OPENAI_TIMESFORMER_LARGE_336PX_GPT2_XL = object
+        tokenizer_module = ModuleType("LaViLa.lavila.models.tokenizer")
+        tokenizer_module.MyGPT2Tokenizer = object
+        narrator_module = ModuleType("LaViLa.eval_narrator")
+        narrator_module.decode_one = lambda tokens, tokenizer: ""
+    
+        for name, module in {
+            "torch": torch_module,
+            "torchvision": torchvision_module,
+            "torchvision.transforms": transforms_module,
+            "torchvision.transforms._transforms_video": (
+                video_transforms_module
+            ),
+            "LaViLa.lavila.data.video_transforms": video_transform_module,
+            "LaViLa.lavila.models.models": models_module,
+            "LaViLa.lavila.models.tokenizer": tokenizer_module,
+            "LaViLa.eval_narrator": narrator_module,
+        }.items():
+            monkeypatch.setitem(sys.modules, name, module)
+    
+        monkeypatch.syspath_prepend(str(VIDEO_AGENT_ROOT))
+        spec = importlib.util.spec_from_file_location(
+            "captioning_provider_under_test",
+            CAPTIONING_PATH,
+        )
+        assert spec is not None and spec.loader is not None
+        module = importlib.util.module_from_spec(spec)
+>       spec.loader.exec_module(module)
+
+tests/unit/test_video_agent_provider_migration.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+<frozen importlib._bootstrap_external>:883: in exec_module
+    ???
+<frozen importlib._bootstrap>:241: in _call_with_frames_removed
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    import sys
+    from pathlib import Path
+    
+    from runtime_config import resolve_video_agent_path
+    
+    sys.path.insert(0, str(resolve_video_agent_path("LaViLa")))
+    import os
+    import urllib.request
+    from collections import OrderedDict
+>   import numpy as np
+E   ModuleNotFoundError: No module named 'numpy'
+
+video-agent-tools/VideoAgent/captioning.py:10: ModuleNotFoundError
+=================================== FAILURES ===================================
+_____ test_provider_rollout_executes_local_tools_and_replays_text_history ______
+
+    def test_provider_rollout_executes_local_tools_and_replays_text_history() -> None:
+>       module = load_module()
+
+tests/unit/test_provider_rollout.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/test_provider_rollout.py:25: in load_module
+    spec.loader.exec_module(module)
+<frozen importlib._bootstrap_external>:883: in exec_module
+    ???
+<frozen importlib._bootstrap>:241: in _call_with_frames_removed
+    ???
+train/utils/provider_rollout.py:6: in <module>
+    from tool_schema import Response
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    from typing import Optional, Any
+>   from pydantic import BaseModel, ConfigDict, Field
+E   ModuleNotFoundError: No module named 'pydantic'
+
+train/tool_schema.py:2: ModuleNotFoundError
+__________ test_object_query_uses_deepseek_v4_flash_without_thinking ___________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f82134f0dc0>
+sandbox_manager_module = <module 'sandbox_manager_under_test' from '/data/ycfeng/step-sandbox/TVCache/.worktrees/yc-sandbox/video-agent-tools/VideoAgent/sandbox_manager.py'>
+
+    def test_object_query_uses_deepseek_v4_flash_without_thinking(
+        monkeypatch: pytest.MonkeyPatch,
+        sandbox_manager_module: ModuleType,
+    ) -> None:
+        manager = _empty_manager(sandbox_manager_module)
+        manager.provider_api_key = "test-stepcode-key"
+        manager.provider_base_url = "https://models-proxy.stepfun-inc.com"
+        manager.get_toolkit = lambda sandbox_id: SimpleNamespace()
+        monkeypatch.setattr(
+            sandbox_manager_module.pickle,
+            "load",
+            lambda file: SimpleNamespace(template=""),
+        )
+        model_calls: list[dict[str, object]] = []
+    
+        def record_model(**kwargs):
+            model_calls.append(kwargs)
+            return object()
+    
+        monkeypatch.setattr(
+            sandbox_manager_module,
+            "ChatOpenAI",
+            record_model,
+        )
+        monkeypatch.setattr(
+            sandbox_manager_module,
+            "create_react_agent",
+            lambda *args, **kwargs: object(),
+        )
+    
+        class SuccessfulAgentExecutor:
+            def __init__(self, **kwargs) -> None:
+                return None
+    
+            def invoke(self, inputs):
+                return {"output": "answer"}
+    
+        monkeypatch.setattr(
+            sandbox_manager_module,
+            "AgentExecutor",
+            SuccessfulAgentExecutor,
+        )
+    
+        assert manager.object_memory_querying(
+            "sandbox-1",
+            "question",
+        ) == "answer"
+>       assert model_calls == [
+            {
+                "model": "deepseek-v4-flash",
+                "temperature": 0.0,
+                "api_key": "test-stepcode-key",
+                "base_url": "https://models-proxy.stepfun-inc.com",
+                "model_kwargs": {
+                    "extra_body": {
+                        "thinking": {
+                            "type": "disabled",
+                        },
+                    },
+                },
+            },
+        ]
+E       AssertionError: assert [{'api_key': ...led'}}}, ...}] == [{'api_key': ...led'}}}, ...}]
+E         
+E         At index 0 diff: {'model': 'deepseek-v4-flash', 'temperature': 0.0, 'api_key': 'test-stepcode-key', 'base_url': 'https://models-proxy.stepfun-inc.com/v1', 'model_kwargs': {'extra_body': {'thinking': {'type': 'disabled'}}}} != {'model': 'deepseek-v4-flash', 'temperature': 0.0, 'api_key': 'test-stepcode-key', 'base_url': 'https://models-proxy.stepfun-inc.com', 'model_kwargs': {'extra_body': {'thinking': {'type': 'disabled'}}}}
+E         Use -v to get more diff
+
+tests/unit/test_sandbox_manager_lifecycle.py:517: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_provider_rollout.py::test_provider_rollout_executes_local_tools_and_replays_text_history
+FAILED tests/unit/test_sandbox_manager_lifecycle.py::test_object_query_uses_deepseek_v4_flash_without_thinking
+ERROR tests/unit/test_video_agent_provider_migration.py::test_on_demand_captioning_uses_local_lavila_and_zero_api_tokens
+2 failed, 184 passed, 1 xfailed, 1 error in 1.64s

@@ -1,0 +1,12 @@
+Using CPython 3.10.6 interpreter at: /usr/bin/python3.10
+Creating virtual environment at: tvcache/client/.venv
+   Building tvclient @ file:///data/ycfeng/step-sandbox/TVCache/.worktrees/yc-sandbox/tvcache/client
+  × Failed to build `tvclient @
+  │ file:///data/ycfeng/step-sandbox/TVCache/.worktrees/yc-sandbox/tvcache/client`
+  ├─▶ Failed to resolve requirements from `build-system.requires`
+  ├─▶ No solution found when resolving: `hatchling`
+  ├─▶ Request failed after 3 retries in 50.6s
+  ├─▶ Failed to fetch: `https://pypi.org/simple/hatchling/`
+  ├─▶ error sending request for url (https://pypi.org/simple/hatchling/)
+  ├─▶ client error (Connect)
+  ╰─▶ operation timed out
