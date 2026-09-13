@@ -32,6 +32,13 @@ class DeterministicToolCall(ToolCall):
         return True
 
 
+class ReadOnlyDeterministicToolCall(DeterministicToolCall):
+    """A deterministic history entry omitted from the stateful cache chain."""
+
+    def will_mutate_state(self) -> bool:
+        return False
+
+
 class DeterministicEnvironment(ToolCallEnv):
     states: dict[str, list[str]] = {}
     backend_executions: list[str] = []
@@ -225,6 +232,54 @@ async def test_exact_hit_and_partial_prefix_reuse_backend_execution() -> None:
         assert exact_executor.get_stats()["tool_executions"] == 0
         assert prefix_executor.get_stats()["prefix_hits"] == 1
         assert prefix_executor.get_stats()["tool_executions"] == 1
+    finally:
+        cache.ttl_cleanup_stop_event.set()
+        cache.ttl_cleanup_thread.join(timeout=1)
+
+    assert not cache.ttl_cleanup_thread.is_alive()
+
+
+@pytest.mark.asyncio
+@pytest.mark.xfail(
+    strict=True,
+    reason=(
+        "B01: filtered stateful-prefix length is used as a cursor into "
+        "the original tool-call history"
+    ),
+)
+async def test_filtered_prefix_cursor_does_not_replay_prior_mutation() -> None:
+    """Lock the mixed mutating/read-only cursor regression without fixing it."""
+    DeterministicEnvironment.states.clear()
+    DeterministicEnvironment.backend_executions.clear()
+    DeterministicEnvironment.stopped_environments.clear()
+    DeterministicEnvironment.next_id = 0
+    cache = ImmutableEnvPrefixTreeCache()
+    client = InMemoryAsyncCacheClient(cache)
+
+    try:
+        donor = _new_executor(client)
+        await donor.execute(
+            [
+                DeterministicToolCall("M1"),
+                ReadOnlyDeterministicToolCall("R1"),
+                DeterministicToolCall("M2"),
+            ]
+        )
+        assert DeterministicEnvironment.backend_executions == ["M1", "M2"]
+
+        recipient = _new_executor(client)
+        result = await recipient.execute(
+            [
+                DeterministicToolCall("M1"),
+                ReadOnlyDeterministicToolCall("R1"),
+                DeterministicToolCall("M2"),
+                DeterministicToolCall("M3"),
+            ]
+        )
+
+        # A filtered prefix [M1, M2] must map to raw index 3 after M1/R1/M2.
+        assert result == "M1/M2/M3"
+        assert DeterministicEnvironment.backend_executions == ["M1", "M2", "M3"]
     finally:
         cache.ttl_cleanup_stop_event.set()
         cache.ttl_cleanup_thread.join(timeout=1)
