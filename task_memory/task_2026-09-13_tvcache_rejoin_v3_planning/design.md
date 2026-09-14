@@ -3,12 +3,13 @@
 | Date       | Summary of Changes |
 | ---------- | ------------------ |
 | 2026-09-13 | Recorded the interpreted research design and evidence flow from the v3 source plan. |
+| 2026-09-15 | Added the P03 runtime evidence path and kept the design aligned with the completed harness and tool surface. |
 
 # Design Record
 
 ## Purpose
 
-This record turns the v3 document into a small research design that can be executed later without silently expanding the scope. The current task only records the design; it does not create the harness, call an API, change TVCache, or claim measured results.
+This record turns the v3 document into a small research design that can be executed without silently expanding the scope. P00–P03 execution artifacts now exist; the design still does not claim provider opportunity measurements or TVCache serving results before P04–P06 evidence is collected.
 
 ## Core idea
 

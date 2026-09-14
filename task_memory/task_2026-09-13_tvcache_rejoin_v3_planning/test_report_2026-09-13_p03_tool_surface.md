@@ -3,6 +3,7 @@
 | Date       | Summary of Changes |
 | ---------- | ------------------ |
 | 2026-09-13 | Recorded P03 structured tool declaration and local executor checks. |
+| 2026-09-15 | Linked the tool check to the completed P03 runtime and verifier evidence. |
 
 # P03 Tool Surface Verification
 
@@ -60,3 +61,5 @@ tool_surface=PASS declarations=8 S0=7 S1=1
 ```
 
 The check covered all eight tools, a file mutation and readback, directory listing, regular-expression search, metadata lookup, shell output, file removal, and path escape rejection. This establishes local tool behavior and declaration consistency; it does not establish container isolation or provider rollout behavior.
+
+P03 runtime preparation is now complete in the separate 2026-09-15 report. The current tool implementation is reused by the four-task P04 smoke preparation; provider rollout behavior remains untested.

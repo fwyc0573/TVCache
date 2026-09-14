@@ -3,6 +3,7 @@
 | Date       | Summary of Changes |
 | ---------- | ------------------ |
 | 2026-09-13 | Recorded the ten-task W1 candidate cohort and four-task smoke subset. |
+| 2026-09-15 | Resolved final image tags and registry digests, and linked each task to its build and verifier evidence. |
 
 # ReJoin W1 Pilot Cohort Selection
 
@@ -11,9 +12,9 @@
 - Target: ReJoin v3 P03/P04 observation-only filesystem workload
 - Selected: 10 primary tasks; Excluded examples: 4
 
-## Important image-digest note
+## Image-digest status
 
-`image_digest` is intentionally left `null` in the candidate manifest. Terminal-Bench task compose files build task-local images; a truthful OCI/local content digest does not exist until the pinned build context is built. Do **not** substitute the Dockerfile Git blob SHA or the base-image tag for the runtime image digest. Before P04, build each selected task at the pinned revision and fill `image_digest` with `docker image inspect ... --format '{{.Id}}'`. The manifest includes an exact resolution command per task.
+At selection time the candidate manifest left `image_digest` as `null`. On 2026-09-15, all ten images were built through StepBPS because the CPU master has no usable Docker runtime. The manifest now records the private registry `Docker-Content-Digest` for each final image tag, together with the build pipeline, Dockerfile fingerprint, and H200 verifier evidence. The authoritative digest query snapshot is `/data/ycfeng/tmp/rejoin_p03_runtime_digests.json`.
 
 ## Inclusion criteria
 
@@ -54,6 +55,23 @@ If these produce too few mutations/tool calls, replace the simplest data task in
 | `fix-git` | Task correctness depends on Git history/refs under .git. v3 explicitly proposes ignoring .git in the workspace manifest, so including this task would make state classification unsound. |
 | `add-benchmark-lm-eval-harness` | Requires cloning two external repositories, constructing a 93k-row dataset, building/installing a library system-wide, and long external/network-heavy execution. Poor fit for the first observation-only pilot. |
 
+## Resolved runtime metadata
+
+| Task | Final image tag | `image_digest` | Verifier result |
+|---|---|---|---|
+| `wasm-pipeline` | `terminal-bench-wasm-pipeline-rejoin-v3-d28711d0da26-v3` | `sha256:a57a8486a3a2b0082dbf3dd98c96262c699253e587b9a95865c141ffd8a54faa` | PASS (3) |
+| `polyglot-c-py` | `terminal-bench-polyglot-c-py-rejoin-v3-d28711d` | `sha256:8055ca32d2f789a904dc541dfd738b2c3ddc299eaec16e6560db18645abc30fc` | PASS (1) |
+| `extract-elf` | `terminal-bench-extract-elf-rejoin-v3-d28711d0da26` | `sha256:9695e51af59a1f1355825eb1707ee0ac9e33f14c9fd930300befda8029bb6e0f` | PASS (2) |
+| `multi-source-data-merger` | `terminal-bench-multi-source-data-merger-rejoin-v3-d28711d0da26-v2` | `sha256:11122a8a51c97ad466ba793c98d04d620db6b80ac6dfc667e3f3e28bdcd3dc40` | PASS (3) |
+| `recover-accuracy-log` | `terminal-bench-recover-accuracy-log-rejoin-v3-d28711d0da26-v2` | `sha256:cff1441dc2937aa431d57a43fc343dd30e1e5efe9d30937156984424f78c9c97` | PASS (3) |
+| `log-summary-date-ranges` | `terminal-bench-log-summary-date-ranges-rejoin-v3-d28711d0da26` | `sha256:2c33f28e0da5e281dea2aecd246f9d5a7200225eb3d8d702a5eaa8677a94cf1f` | PASS (2) |
+| `jq-data-processing` | `terminal-bench-jq-data-processing-rejoin-v3-d28711d0da26-v2` | `sha256:c35deeaf65d00112283ff15e37d6c767cf38c3ccebc3bd5cf591147806dd4881` | PASS (14) |
+| `pandas-etl` | `terminal-bench-pandas-etl-rejoin-v3-d28711d0da26-v2` | `sha256:52451b768b01905639f18fbac53d030ebf16419741522641e2cc797298bda94b` | PASS (3) |
+| `jsonl-aggregator` | `terminal-bench-jsonl-aggregator-rejoin-v3-d28711d0da26` | `sha256:03beb2d2cf4d7c566f5208782e04e5c3e0806be042a6936d4b1085d7a4257bad` | PASS (1) |
+| `gcode-to-text` | `terminal-bench-gcode-to-text-rejoin-v3-d28711d0da26-v8` | `sha256:5cb7f47842c3f83e3299f720f1abe10a0f08a6076e90c6e7379a9621202d7e65` | PASS (2) |
+
+All ten rows also carry `solution_exit_code=0`, `verifier_exit_code=0`, worker status `succeeded`, and evidence paths in `rejoin_w1_candidate_manifest.jsonl`.
+
 ## Metadata contract for Codex
 
 For every selected task, P03 should copy the JSONL entry into the repository cohort file and then fill only the runtime-resolved fields:
@@ -64,4 +82,4 @@ build_timestamp
 optional base_image_repo_digest
 ```
 
-Do not rewrite `source_revision`, instruction, task root, stratum, or include reason after observing rollout/cache results.
+The runtime fields are now filled. Do not rewrite `source_revision`, instruction, task root, stratum, or include reason after observing rollout/cache results.

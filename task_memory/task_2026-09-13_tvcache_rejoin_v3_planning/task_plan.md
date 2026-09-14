@@ -4,6 +4,7 @@
 | ---------- | ------------------ |
 | 2026-09-13 | Added the planning index for the ReJoin v3 task. |
 | 2026-09-13 | Updated the index to reflect execution through P02 and the P03 input audit. |
+| 2026-09-15 | Recorded P03 runtime image builds, registry digests, verifier passes, and the four-task smoke readiness result. |
 
 # Task Plan Index
 
@@ -18,7 +19,7 @@ Translate `draft-plan/TVCache_ReJoin_Codex_Plan_v3_ZH.md` into durable task reco
 | P00 CPU baseline | complete | `p00_baseline/` and `test_report_2026-09-13_p00_cpu_baseline.md` |
 | P01 B01 cursor reproducer | complete | `issues.md` and `test_report_2026-09-13_b01_cursor_reproducer.md` |
 | P02 research harness | complete | `p02_harness/` and `test_report_2026-09-13_p02_harness.md` |
-| P03 cohort/tool surface | pending | `p03_cohort_audit.md` and `test_report_2026-09-13_p03_cohort_audit.md`; W1 manifest inputs are missing |
+| P03 cohort/tool surface | complete | `rejoin_w1_candidate_manifest.jsonl`, `p03_source_pin.md`, `test_report_2026-09-15_p03_gpu_image_build.md`, and the eight-tool implementation |
 | P04–P08 | pending | Blocked by packet dependencies and M0/M1 gates |
 
 ## Dependency map
@@ -35,6 +36,7 @@ Translate `draft-plan/TVCache_ReJoin_Codex_Plan_v3_ZH.md` into durable task reco
 - `plan.md`: ordered packets, gates, dependencies, and deferred work.
 - `progress.md`: commands, observed results, and decisions.
 - `summary.md`: English archive and deliverable inventory.
+- `rejoin_w1_cohort_selection.md` and `rejoin_w1_candidate_manifest.jsonl`: selected W1 tasks, build identities, runtime digests, and verifier evidence.
 
 ## Verification rule
 

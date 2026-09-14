@@ -4,6 +4,7 @@
 | ---------- | ------------------ |
 | 2026-09-13 | Recorded initial source-location and scope findings while starting the v3 plan analysis. |
 | 2026-09-13 | Completed the v3 source extraction: research questions, workloads, evidence classes, milestones, packets, gates, and deferred work. |
+| 2026-09-15 | Added verified P03 source, build, registry digest, worker, and verifier findings. |
 
 # Findings
 
@@ -78,8 +79,16 @@ Before M0/M1 the plan prohibits new TVCache endpoints, distributed cache, reflin
 
 The early-stage result is a data-backed answer to four questions: whether post-divergence opportunity exists beyond prefix reuse, whether it is in typed S0 or raw S1, whether local guards/effects are safe for a supported operation, and whether reuse overhead is clearly below real expensive execution. A negative result is a valid stop signal.
 
+## P03 runtime findings (2026-09-15)
+
+- Terminal-Bench source is checked out at `/data/ycfeng/tmp/terminal-bench-1-d28711d0da2675d0bb1d56de45ae5df6082438a3` with revision `d28711d0da2675d0bb1d56de45ae5df6082438a3`.
+- Ten selected W1 images were built through StepBPS because the CPU master cannot run Docker. The final image tags and registry `Docker-Content-Digest` values are recorded in `rejoin_w1_candidate_manifest.jsonl` and `/data/ycfeng/tmp/rejoin_p03_runtime_digests.json`.
+- Ten H200 worker jobs ran `solution.sh` and `run-tests.sh` in their matching images. Every solution and verifier exit code is 0 and every worker reached `succeeded`.
+- The four-task P04 smoke set has complete build and verifier evidence. Provider rollout remains unstarted, so no opportunity class or time-share result is claimed.
+- The P02 `research/rejoin/` package and the P03 eight-tool surface are present in the repository and direct tests pass.
+
 ## Source gaps to check against code
 
 - The plan names `ProviderChatClient`, `AsyncSemanticStatefulExecutor._execute_commands()`, and the B01 cursor issue as later implementation anchors; their current symbols and tests need read-only verification before implementation packets are scheduled.
-- P02's proposed `research/rejoin/` layout, provider availability, benchmark task source, and image digests are planning assumptions, not current artifacts.
+- P04 provider availability and rollout settings remain open decisions. The benchmark task source, image tags, and image digests are now current artifacts recorded in the task memory and external evidence directories.
 - P00 asks to record archived provider-backed video E2E facts; this task only records the requirement and does not re-run or certify those results.

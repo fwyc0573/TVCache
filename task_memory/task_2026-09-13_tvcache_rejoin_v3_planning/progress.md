@@ -11,8 +11,9 @@
 | 2026-09-13 | Removed the prohibited token names from the validation report while retaining the check description; the final scan returned no matches. |
 | 2026-09-13 | Updated the root planning index to the skill's phase format; `check-complete.sh` reported `ALL PHASES COMPLETE (4/4)`. |
 | 2026-09-13 | Follow-up execution started. P00 baseline completed with the Basemind mirror after public PyPI `hatchling` resolution timed out; P01 B01 reproducer and evidence commit completed. |
+| 2026-09-15 | Completed P03 runtime preparation on H200: built ten final images, captured registry digests, ran all ten verifiers, and confirmed the eight-tool surface. |
 
-# Status: in-progress
+# Status: in-progress (P04 provider smoke is pending)
 
 ## Steps
 
@@ -25,7 +26,8 @@
 | Verify documents and close planning phase | completed | Document path, source coverage, forbidden-terminology, plan-copy, validation report, and summary checks are complete. |
 | P00 CPU baseline capture | completed | Mirror-backed suite: `184 passed, 2 failed, 1 xfailed, 1 error in 1.64s`; raw logs and environment record under `p00_baseline/`. |
 | P01 B01 cursor issue lock | completed | Strict `xfail` reproducer; `--runxfail` observed `M1/M2/M2/M3`; commits `cce8520` and `30ff78f`. |
-| P02 minimal research harness | in-progress | Repository audit found no `research/` package; lightweight Python 3.10 package design is ready for implementation. |
+| P02 minimal research harness | completed | `research/rejoin/` package, direct tests, JSONL trace, and workspace manifest checks passed. |
+| P03 cohort/runtime/tool surface | completed | Ten-task manifest, pinned source, final image digests, ten verifier passes, four-task smoke readiness, and eight-tool implementation are complete. |
 
 ## Errors and Adjustments
 
@@ -49,22 +51,67 @@
 
 P02 is complete. P03 may now freeze the W1 cohort and S0/S1 tool surface. P04 collector preparation may proceed in parallel, but real provider execution remains gated by P03 inputs and the documented smoke gate.
 
-## P03 audit
+## P03 audit (2026-09-13 checkpoint)
 
 - Read-only inventory found no approved W1 manifest containing task IDs, source revisions, image digests, task roots, and verifiers.
 - The existing EgoSchema manifest is a video asset record and cannot serve as the W1 filesystem cohort.
-- P03 remains pending for runtime image and verifier completion. No provider, GPU, Docker, or serving execution was started.
+- At that checkpoint P03 remained pending for runtime image and verifier completion; no provider, GPU, Docker, or serving execution had started yet.
 
-## P03 continuation: source and runtime readiness
+## P03 continuation: source and runtime readiness (2026-09-13 checkpoint)
 
 - Read and accepted the ten-task W1 candidate manifest and four-task smoke subset supplied by the user.
 - Checked out `harbor-framework/terminal-bench-1` at `d28711d0da2675d0bb1d56de45ae5df6082438a3` under `/data/ycfeng/tmp/terminal-bench-1-d28711d0da2675d0bb1d56de45ae5df6082438a3`; detached checkout has no local edits.
 - Verified every selected task has a Dockerfile and `run-tests.sh`; all ten verifier scripts pass `bash -n`.
-- Image digests are still null by design. The host has no Docker-compatible executable or `/var/run/docker.sock`, so image build, digest capture, and in-container verifier execution cannot proceed here.
+- Image digests were still null at that checkpoint. The host had no Docker-compatible executable or `/var/run/docker.sock`, so image build and in-container verifier execution could not proceed there.
 - Deleted only task-generated Python caches and old P00/P02 temporary directories that are not needed for later evidence. Pinned Terminal-Bench source and required task memory records were retained.
 - Implemented seven structured S0 tools (`read_file`, `write_file`, `list_dir`, `grep`, `stat`, `mkdir`, `remove`) and one mutating S1 `exec`, with serializable declarations and workspace path checks. Direct local checks passed for all eight tools.
 - P03 runtime readiness report records the exact source revision, ten verifier syntax passes, and the Docker runtime blocker.
 
-## Next decision
+## Next decision at the 2026-09-13 checkpoint
 
-P03 source pinning and local tool surface are complete. Wait for a supported container runtime to build images and run verifiers; do not start P04 smoke until the four smoke image digests and verifier results are available.
+P03 source pinning and local tool surface were complete. The recorded next step was to obtain a supported container runtime, then build images and run verifiers before starting P04 smoke.
+
+## P03 runtime/verifier completion (2026-09-15)
+
+### Change
+
+Completed the runtime portion of P03 using the supplied ten-task W1 cohort. The CPU master had no usable Docker runtime, so StepBPS built the images and StepMind Python `RJobBackend` ran the solution and verifier on an H200 worker. The final runner was `/data/ycfeng/tmp/run_rejoin_verifier_worker_v5.py`.
+
+### Commands and evidence
+
+```bash
+python3 /data/ycfeng/tmp/rejoin_query_digests.py
+python3 /data/ycfeng/tmp/update_rejoin_manifest.py
+```
+
+The digest query returned HTTP 200 and a `Docker-Content-Digest` for all ten final tags. The manifest update checked every selected row for a non-empty `sha256:` digest, the pinned source revision, a successful build record, and a passing verifier record. Build Dockerfiles and metadata are under `/data/ycfeng/tmp/rejoin-p03-stepbps-dockerfiles/` and `/data/ycfeng/tmp/stepbps_*`.
+
+### Observed result
+
+All ten tasks have `solution_exit_code=0`, `verifier_exit_code=0`, and worker status `succeeded`:
+
+| Task | Verifier result | GPU worker job |
+|---|---:|---|
+| `wasm-pipeline` | 3 passed | `exp-0915-042621-073453` |
+| `polyglot-c-py` | 1 passed | `exp-0915-042702-548718` |
+| `extract-elf` | 2 passed | `exp-0915-042738-970432` |
+| `multi-source-data-merger` | 3 passed | `exp-0915-041241-577015` |
+| `recover-accuracy-log` | 3 passed | `exp-0915-041324-275817` |
+| `log-summary-date-ranges` | 2 passed | `exp-0915-042820-109873` |
+| `jq-data-processing` | 14 passed | `exp-0915-041357-298827` |
+| `pandas-etl` | 3 passed | `exp-0915-041425-871357` |
+| `jsonl-aggregator` | 1 passed | `exp-0915-042901-387245` |
+| `gcode-to-text` | 2 passed | `exp-0915-042450-505362` |
+
+The complete solution logs, verifier logs, `nvidia-smi` logs, and JSON summaries are in `/data/ycfeng/tmp/rejoin-verifier-logs/`. The seven S0 tools and mutating S1 `exec` direct checks pass in `research/rejoin/tests/test_tools.py`.
+
+### Decision
+
+P03 is complete. P04 may start with the four verified smoke tasks. A provider endpoint, model profile, and rollout artifact location are still required before real API collection.
+
+## P03 disk cleanup (2026-09-15)
+
+- Retained the 312 MB pinned Terminal-Bench checkout because P04 reuses its task source.
+- Retained the final context-free Dockerfiles, build snapshots, registry digest snapshot, verifier logs, and runner v5 because they support review or P04 preparation.
+- Removed 28 archived P03 intermediates: failed gcode/wasm result snapshots, superseded build and worker probe scripts/logs, and generated Python cache directories. Their causes and final fixes are recorded in `issues.md` and the P03 GPU report.
+- No large P03 artifact was safe to compress while keeping the source checkout directly reusable. Unrelated large files in `/data/ycfeng/tmp` were not changed because their reuse status is outside this task.

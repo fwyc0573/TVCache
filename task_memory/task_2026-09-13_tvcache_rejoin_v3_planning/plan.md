@@ -3,12 +3,13 @@
 | Date       | Summary of Changes |
 | ---------- | ------------------ |
 | 2026-09-13 | Landed the v3 execution plan as ordered packets with gates, artifacts, and verification rules. |
+| 2026-09-15 | Closed P03 after GPU-worker image builds, registry digest capture, verifier execution, and tool-surface checks. |
 
 # ReJoin v3 Execution Plan
 
 ## Current status
 
-The user has authorized execution. P00, P01, and P02 are complete; P03 is pending its missing W1 task manifest and runtime metadata. The source of truth remains `draft-plan/TVCache_ReJoin_Codex_Plan_v3_ZH.md`, originally pinned at `43cf9d6a779eb5149e0fae50b9a3a891dcbaed6f`; the current checkout includes the execution evidence commits.
+The user has authorized execution. P00, P01, P02, and P03 are complete; P04 is pending the provider choice and smoke rollout. The source of truth remains `draft-plan/TVCache_ReJoin_Codex_Plan_v3_ZH.md`, originally pinned at `43cf9d6a779eb5149e0fae50b9a3a891dcbaed6f`; the current checkout includes the execution evidence commits.
 
 ## Execution status
 
@@ -17,7 +18,7 @@ The user has authorized execution. P00, P01, and P02 are complete; P03 is pendin
 | P00 baseline capture | complete | `p00_baseline/baseline.md`, `environment.md`, and raw pytest logs. |
 | P01 cursor issue lock | complete | B01 strict `xfail`, forced failure evidence, and `issues.md`; commits `cce8520`, `30ff78f`. |
 | P02 minimal research harness | complete | `research/rejoin/` package, direct execution support, JSONL trace, manifest analysis, and smoke evidence are complete. |
-| P03 cohort/tool surface | in-progress | W1 cohort, pinned Terminal-Bench source, and local eight-tool surface are ready; image builds and verifier runs are pending because this host has no container runtime. |
+| P03 cohort/tool surface | complete | Ten W1 images were built through StepBPS, registry digests were captured, all ten verifiers passed on H200, and the eight-tool surface passed direct checks. |
 | P04 API rollout collector | pending | Depends on P02 and P03. |
 | P05 opportunity pilot | pending | Depends on P04 smoke gate. |
 | P06 decision | pending | Depends on P05 analysis. |
@@ -77,7 +78,7 @@ research/rejoin/
 
 **Acceptance:** each tool declares its mutation behavior; S0 facts are serializable; S1 has no dependency classifier; task selection is reviewable.
 
-**Current execution:** the ten-task candidate manifest and four-task smoke subset are recorded in `rejoin_w1_candidate_manifest.jsonl` and `rejoin_w1_cohort_selection.md`. The source checkout is pinned and verified in `p03_source_pin.md`. Runtime image digests and in-container verifier results remain pending.
+**Current execution:** the ten-task manifest and four-task smoke subset are recorded in `rejoin_w1_candidate_manifest.jsonl` and `rejoin_w1_cohort_selection.md`. The source checkout is pinned in `p03_source_pin.md`. StepBPS built all ten final images, the private registry returned a `Docker-Content-Digest` for each tag, and each image passed its in-container `solution.sh` plus `run-tests.sh` check on an H200 worker. The eight-tool surface is implemented under `research/rejoin/src/rejoin/tools.py` and covered by direct tests. P03 is complete; P04 may begin with the four-task smoke rollout.
 
 ### P04 — API rollout collector
 

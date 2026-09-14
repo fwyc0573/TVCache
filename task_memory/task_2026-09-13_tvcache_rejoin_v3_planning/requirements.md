@@ -4,6 +4,7 @@
 | ---------- | ------------------ |
 | 2026-09-13 | Created task record for converting the v3 ReJoin research plan into durable planning documents. |
 | 2026-09-13 | Follow-up request authorized execution of the recorded plan, starting at P00 and continuing through the ready packets. |
+| 2026-09-15 | Recorded the CPU-master Docker limitation and the approved GPU-worker build and verifier route for P03. |
 
 # Requirements
 
@@ -26,7 +27,13 @@
 
 ## Latest follow-up
 
-用户已提供第一版 W1 filesystem task selection 和 candidate manifest，并指定下一步为：checkout/pin Terminal-Bench source；构建十个 task image 并填 runtime digest；验证 verifier；实现 seven S0 plus one S1 tool surface；使用四个 task 启动 P04 smoke。当前主机缺少 container runtime，因此 image build 和 in-container verifier 执行需在 runtime 可用后继续。
+用户已提供第一版 W1 filesystem task selection 和 candidate manifest，并指定下一步为：checkout/pin Terminal-Bench source；构建十个 task image 并填 runtime digest；验证 verifier；实现 seven S0 plus one S1 tool surface；使用四个 task 启动 P04 smoke。CPU master 没有可用 Docker runtime，因此已按用户建议通过 H200 GPU worker 的 StepBPS build path 完成 image 构建，并在同一 image 中运行 verifier。
+
+## Latest execution update
+
+- P03 source revision is pinned at `d28711d0da2675d0bb1d56de45ae5df6082438a3`.
+- Ten selected task images have successful StepBPS build records, registry manifest digests, and H200 worker verifier evidence.
+- The four P04 smoke tasks are ready to run; no provider rollout has started yet.
 
 ## Acceptance Criteria
 
