@@ -4,6 +4,7 @@
 | ---------- | ------------------ |
 | 2026-09-13 | Archived the planning result for ReJoin v3. |
 | 2026-09-15 | Archived P03 runtime image, digest, verifier, and tool-surface evidence. |
+| 2026-09-15 | Added cloud preservation results and the queued P04 execution checkpoint. |
 
 # Task Overview
 
@@ -43,3 +44,11 @@ PASS. The source file was confirmed at 1,310 lines. P00 recorded the CPU baselin
 # Open Items / Future Extensions
 
 P04 provider smoke is the next step. It still requires an authorized API endpoint and model profile, fixed sampling settings, a rollout artifact location, and confirmation that the four-task smoke gate is met. P05 opportunity analysis, two W2-T1 instances, and any TVCache serving work remain deferred until the later gates pass.
+
+## 2026-09-15 cloud and P04 checkpoint
+
+Cloud preservation is complete under `/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3`: 67 verified staged files, ten complete image manifests, 69 unique blobs totaling 1,452,034,837 bytes. Job `exp-0915-140553-008483` reported NVIDIA H200 and succeeded with personal auth and the current local NFS source. See `cloud_storage.md`, `cloud_evidence/`, and `test_report_2026-09-15_cloud_persistence.md`.
+
+P04 implementation now includes `research/rejoin/scripts/collect_p04.py`, `tool_process.py`, and `check_p04.py`, plus the local launcher `tests/e2e/run_rejoin_p04.py` and isolation check `tests/e2e/check_rejoin_tool_process.py`. The provider is `deepseek-v4-flash` at `https://models-proxy.stepfun-inc.com`. The local isolation check, three existing tool tests, verifier-package imports, and live provider preflight passed.
+
+The corrected first worker `exp-0915-141415-207218` is waiting for H200 quota. Its local launcher and automatic 15-rollout continuation remain alive. No completed P04 smoke is claimed. `p04_smoke.md` records the settings; `test_report_2026-09-15_p04_preparation.md` records commands and limits. Future work is to observe actual worker results, address any evidenced collection issue, read the generated smoke report, and enter P05 only when that gate passes.

@@ -3,6 +3,7 @@
 | Date       | Summary of Changes |
 | ---------- | ------------------ |
 | 2026-09-15 | Recorded the final StepBPS image builds, registry digest checks, H200 verifier jobs, and P03 acceptance evidence. |
+| 2026-09-15 | Clarified the failed GPU-command logs after checking them during cloud persistence. |
 
 # P03 GPU Image Build and Verifier Report
 
@@ -97,6 +98,8 @@ All ten build records completed with status `success`. The registry query return
 
 The four P04 smoke tasks are the first four rows in the selection record: `wasm-pipeline`, `polyglot-c-py`, `multi-source-data-merger`, and `recover-accuracy-log`. Each has a successful build, a digest, and a passing verifier.
 
+The saved P03 `nvidia-smi` logs contain `command not found`. H200 placement was supplied by platform job records; these logs do not establish a successful GPU command. P03's solution and verifier outcomes remain valid. A successful GPU command is recorded separately for cloud job `exp-0915-140553-008483` in `test_report_2026-09-15_cloud_persistence.md`.
+
 The direct tool check was:
 
 ```bash
@@ -121,4 +124,3 @@ OK
 ## Decision
 
 P03 runtime, verifier, and tool-surface acceptance criteria pass. P04 collector preparation can proceed with the four-task smoke set. A provider endpoint, model profile, rollout settings, and artifact destination are still required before real API collection.
-

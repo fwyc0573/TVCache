@@ -5,6 +5,7 @@
 | 2026-09-13 | Added the planning index for the ReJoin v3 task. |
 | 2026-09-13 | Updated the index to reflect execution through P02 and the P03 input audit. |
 | 2026-09-15 | Recorded P03 runtime image builds, registry digests, verifier passes, and the four-task smoke readiness result. |
+| 2026-09-15 | Recorded P04 collection preparation, cloud persistence, and current execution evidence. |
 
 # Task Plan Index
 
@@ -20,7 +21,9 @@ Translate `draft-plan/TVCache_ReJoin_Codex_Plan_v3_ZH.md` into durable task reco
 | P01 B01 cursor reproducer | complete | `issues.md` and `test_report_2026-09-13_b01_cursor_reproducer.md` |
 | P02 research harness | complete | `p02_harness/` and `test_report_2026-09-13_p02_harness.md` |
 | P03 cohort/tool surface | complete | `rejoin_w1_candidate_manifest.jsonl`, `p03_source_pin.md`, `test_report_2026-09-15_p03_gpu_image_build.md`, and the eight-tool implementation |
-| P04–P08 | pending | Blocked by packet dependencies and M0/M1 gates |
+| Cloud persistence | complete | `cloud_storage.md` and `test_report_2026-09-15_cloud_persistence.md` |
+| P04 | in-progress | `p04_smoke.md`; first corrected worker is queued for H200 capacity |
+| P05–P08 | pending | Packet dependencies and M0/M1 gates |
 
 ## Dependency map
 
@@ -40,4 +43,4 @@ Translate `draft-plan/TVCache_ReJoin_Codex_Plan_v3_ZH.md` into durable task reco
 
 ## Verification rule
 
-Every execution packet records exact commands, environment, criteria, observed evidence, and unresolved issues in a dated test report. Temporary caches remain outside the repository. No real provider or serving execution starts before P03 inputs and the P04 smoke gate are ready.
+Every execution packet records exact commands, environment, criteria, observed evidence, and unresolved issues in a dated test report. Temporary caches remain outside the repository. Real provider collection requires P03 inputs. P05 requires a passed P04 smoke; serving work requires the later M0/M1 decisions.

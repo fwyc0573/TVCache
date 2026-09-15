@@ -4,12 +4,13 @@
 | ---------- | ------------------ |
 | 2026-09-13 | Landed the v3 execution plan as ordered packets with gates, artifacts, and verification rules. |
 | 2026-09-15 | Closed P03 after GPU-worker image builds, registry digest capture, verifier execution, and tool-surface checks. |
+| 2026-09-15 | Recorded P04 collection preparation, cloud persistence, and current execution evidence. |
 
 # ReJoin v3 Execution Plan
 
 ## Current status
 
-The user has authorized execution. P00, P01, P02, and P03 are complete; P04 is pending the provider choice and smoke rollout. The source of truth remains `draft-plan/TVCache_ReJoin_Codex_Plan_v3_ZH.md`, originally pinned at `43cf9d6a779eb5149e0fae50b9a3a891dcbaed6f`; the current checkout includes the execution evidence commits.
+The user has authorized execution. P00, P01, P02, and P03 are complete; P04 is in progress with the verified StepCode provider and cloud storage. The source of truth remains `draft-plan/TVCache_ReJoin_Codex_Plan_v3_ZH.md`, originally pinned at `43cf9d6a779eb5149e0fae50b9a3a891dcbaed6f`; the current checkout includes the execution evidence commits.
 
 ## Execution status
 
@@ -19,7 +20,7 @@ The user has authorized execution. P00, P01, P02, and P03 are complete; P04 is p
 | P01 cursor issue lock | complete | B01 strict `xfail`, forced failure evidence, and `issues.md`; commits `cce8520`, `30ff78f`. |
 | P02 minimal research harness | complete | `research/rejoin/` package, direct execution support, JSONL trace, manifest analysis, and smoke evidence are complete. |
 | P03 cohort/tool surface | complete | Ten W1 images were built through StepBPS, registry digests were captured, all ten verifiers passed on H200, and the eight-tool surface passed direct checks. |
-| P04 API rollout collector | pending | Depends on P02 and P03. |
+| P04 API rollout collector | in-progress | Provider preflight and cloud transfer passed; the first real rollout is under execution. |
 | P05 opportunity pilot | pending | Depends on P04 smoke gate. |
 | P06 decision | pending | Depends on P05 analysis. |
 
@@ -171,8 +172,8 @@ Every packet must append to `progress.md` with change, reason, command, observed
 
 ## Open decisions for execution time
 
-1. Which authorized API endpoint and model profile pass the smoke gate while exposing stable tool calling?
-2. Which 8–12 W1 tasks and image digests are available locally without adding an unapproved external dependency?
+1. Provider selected: `https://models-proxy.stepfun-inc.com`, `deepseek-v4-flash`; smoke results will decide P04 acceptance.
+2. W1 input settled: ten tasks and verified image digests are recorded in the candidate manifest.
 3. Which two concrete W2-T1 instances provide real compute and explicit effects?
-4. Where should raw pilot artifacts be stored under the repository/task directory while keeping large caches under `/data/ycfeng/tmp`?
+4. Storage settled: durable source, image, and rollout data use the personal cloud task directory in `cloud_storage.md`; caches use worker temporary storage.
 5. Does P00 need a fresh CPU run or can the prior reviewed baseline be cited for a given packet? The executing agent must decide from current checkout state and record the choice.

@@ -4,6 +4,7 @@
 | ---------- | ------------------ |
 | 2026-09-13 | Recorded the B01 mixed-history cursor reproducer and observed failure. |
 | 2026-09-15 | Added the P03 build and verifier failures with their final resolutions. |
+| 2026-09-15 | Recorded P04 collection preparation, cloud persistence, and current execution evidence. |
 
 # Open Issues
 
@@ -34,4 +35,11 @@
 
 ### Current P03 status
 
-All ten selected tasks have successful build metadata, registry manifest digests, solution/verifier exit code 0, and worker status `succeeded`. No P03 blocker remains. P04 still needs a provider endpoint and the four-task smoke rollout.
+All ten selected tasks have successful build metadata, registry manifest digests, solution/verifier exit code 0, and worker status `succeeded`. No P03 blocker remains. P04 has a verified provider endpoint and is executing the four-task smoke sequence.
+
+## P04 execution environment
+
+- The first storage launcher omitted `EXP_ID`; the local backend rejected it before job creation. The reusable launcher now supplies it.
+- Task images do not set NVIDIA binary/library search paths. The first storage job failed with missing `nvidia-smi`; a full handbook worker image completed cloud persistence. The first P04 job then found the binary but exited 12. The P04 wrapper now supplies `/usr/local/nvidia/bin` and `/usr/local/nvidia/lib64` plus `/usr/local/nvidia/lib`. Verification is pending the fresh worker.
+- Platform Python logs for the first P04 job returned zero rows. The runbook-authorized SSH read recovered the exact traceback; future collector logs are written directly to the local mounted task staging directory.
+- Job `exp-0915-141415-207218` is queued: `Insufficient GPU quota`, queue `step-main-default`, `H200=0`. Keep the local launcher alive and inspect the existing job. No additional provider or task input is missing.

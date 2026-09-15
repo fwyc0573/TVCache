@@ -12,6 +12,7 @@
 | 2026-09-13 | Updated the root planning index to the skill's phase format; `check-complete.sh` reported `ALL PHASES COMPLETE (4/4)`. |
 | 2026-09-13 | Follow-up execution started. P00 baseline completed with the Basemind mirror after public PyPI `hatchling` resolution timed out; P01 B01 reproducer and evidence commit completed. |
 | 2026-09-15 | Completed P03 runtime preparation on H200: built ten final images, captured registry digests, ran all ten verifiers, and confirmed the eight-tool surface. |
+| 2026-09-15 | Recorded P04 collection preparation, cloud persistence, and current execution evidence. |
 
 # Status: in-progress (P04 provider smoke is pending)
 
@@ -132,3 +133,17 @@ P03 is complete. P04 may start with the four verified smoke tasks. A provider en
 - Job `exp-0915-140553-008483` passed: 67 verified staged files; 10 image manifests; 69 unique config/layer blobs; 1,452,034,837 blob bytes. Source revision and hashes match the P03 manifest.
 - Actual `nvidia-smi` reported NVIDIA H200. Python backend verified personal creator, local NFS source, and `succeeded` terminal state. Reports and the completion marker were written under the personal cloud root.
 - First P04 job `exp-0915-140853-974340` failed during startup. The first platform log query returned zero rows; the cause is under inspection. No successful provider rollout is claimed.
+
+## P04 preparation verification (2026-09-15)
+
+- CPU isolation check passed on Python 3.10.6: real S0 write plus S1 execution produced 42 from input 21, UID was 65534, and controller mounts were absent. All three existing tool-surface tests passed.
+- Pytest 8.4.1 and seven pinned support packages were installed on the CPU through the company mirror, and import checks passed. These packages are reused by task workers without verifier-time installation.
+- Read-only fallback recovered the first P04 traceback: `nvidia-smi` exited 12 because task images need the mounted NVIDIA library path. Added standard `/usr/local/nvidia` binary/library paths and direct NFS collector logs. A fresh run uses `p04-20260915-v2`; the incomplete first attempt is preserved.
+
+## P04 queue checkpoint and automatic continuation (2026-09-15)
+
+- Current worker: `exp-0915-141415-207218`; run `p04-20260915-v2`; first task `polyglot-c-py/r0`. The exact-job API reports Pending with queue `step-main-default`, insufficient H200 quota, remaining H200=0.
+- The first local launcher remains alive. A second local controller runs `run_rejoin_p04.py --concurrency 4 --await-first`; it waits for the first launcher result, then reuses that completed rollout and runs the remaining 15. No duplicate first job is submitted.
+- The final completing worker runs `check_p04.py`, checks all 16 cloud traces, and writes `<run-id>.smoke.json` plus Markdown under cloud `reports/` and local staging. A collection or smoke failure remains visible; no automatic model change occurs.
+- Waiting commands/logs are under `/data/ycfeng/tmp/rejoin-p04-control/`: `p04-second-launch.log`, `p04-continuation.log`, and per-rollout launcher/collector logs. Detailed commands and the passing CPU checks are in `test_report_2026-09-15_p04_preparation.md`.
+- No completed real rollout or smoke PASS is claimed at this checkpoint. Required user data and unresolved user design decisions: none. Open execution issue: H200 quota; the task-image NVIDIA library correction awaits this worker.
