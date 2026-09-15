@@ -6,10 +6,11 @@
 | 2026-09-15 | Archived P03 runtime image, digest, verifier, and tool-surface evidence. |
 | 2026-09-15 | Added cloud preservation results and the queued P04 execution checkpoint. |
 | 2026-09-15 | Archived the completed P04 v21 smoke result and its verifier limitation. |
+| 2026-09-15 | Archived the completed P05 merged opportunity analysis and typed-U redirect target. |
 
 # Task Overview
 
-The v3 Chinese ReJoin plan was read in full and converted into a durable execution record. P00 baseline capture, P01 B01 issue locking, P02 lightweight harness construction, P03 cohort/runtime preparation, and the P04 provider smoke collection gate are complete. The resulting plan preserves the early-stage research order: measure post-divergence opportunity with real observation traces, then test a small guarded memoizer, and enter TVCache integration only after both evidence gates are positive.
+The v3 Chinese ReJoin plan was read in full and converted into a durable execution record. P00 baseline capture, P01 B01 issue locking, P02 lightweight harness construction, P03 cohort/runtime preparation, P04 provider smoke, and P05 opportunity analysis are complete. The resulting plan preserves the early-stage research order: measure post-divergence opportunity with real observation traces, then test a small guarded memoizer, and enter TVCache integration only after both evidence gates are positive.
 
 # Deliverables Inventory
 
@@ -31,6 +32,9 @@ The v3 Chinese ReJoin plan was read in full and converted into a durable executi
 - P03 GPU image and verifier report: [`test_report_2026-09-15_p03_gpu_image_build.md`](test_report_2026-09-15_p03_gpu_image_build.md)
 - P04 smoke configuration and gate definition: [`p04_smoke.md`](p04_smoke.md)
 - P04 v21 final verification report: [`test_report_2026-09-15_p04_smoke_v21.md`](test_report_2026-09-15_p04_smoke_v21.md)
+- P05 opportunity plan and class rules: [`p05_opportunity_pilot.md`](p05_opportunity_pilot.md)
+- P05 merged analysis verification: [`test_report_2026-09-15_p05_opportunity.md`](test_report_2026-09-15_p05_opportunity.md)
+- P05 v2/v3 record map: [`p05_run_map.json`](p05_run_map.json)
 - Final W1 cohort manifest: [`rejoin_w1_candidate_manifest.jsonl`](rejoin_w1_candidate_manifest.jsonl)
 - W1 cohort selection and runtime table: [`rejoin_w1_cohort_selection.md`](rejoin_w1_cohort_selection.md)
 - Final build Dockerfiles: `/data/ycfeng/tmp/rejoin-p03-stepbps-dockerfiles/`
@@ -42,11 +46,11 @@ The v3 Chinese ReJoin plan was read in full and converted into a durable executi
 
 # Validation Status
 
-PASS. The source file was confirmed at 1,310 lines. P00 recorded the CPU baseline, P01 recorded the strict `xfail` cursor reproducer, and P02 produced a three-event JSONL trace with reloadable records and workspace manifest digests. P03 pinned Terminal-Bench at `d28711d0da2675d0bb1d56de45ae5df6082438a3`, built all ten final images through StepBPS, captured ten private-registry `Docker-Content-Digest` values, and ran every solution plus verifier on an H200 worker. All ten P03 jobs have solution and verifier exit code 0 and worker status `succeeded`. The P04 v21 smoke run completed 16 rollouts with 412 tool calls, 16/16 real mutations, four distinct trajectories per task, both S0/S1 classes, and zero collection errors; its encoded collection gate is PASS. The P04 verifier pass count is 10/16, with all four `recover-accuracy-log` verifier processes exiting 1. The seven S0 tools and mutating S1 `exec` direct tests also pass.
+PASS. The source file was confirmed at 1,310 lines. P00 recorded the CPU baseline, P01 recorded the strict `xfail` cursor reproducer, and P02 produced a three-event JSONL trace with reloadable records and workspace manifest digests. P03 pinned Terminal-Bench at `d28711d0da2675d0bb1d56de45ae5df6082438a3`, built all ten final images through StepBPS, captured ten private-registry `Docker-Content-Digest` values, and ran every solution plus verifier on an H200 worker. All ten P03 jobs have solution and verifier exit code 0 and worker status `succeeded`. The P04 v21 smoke run completed 16 rollouts with 412 tool calls, 16/16 real mutations, four distinct trajectories per task, both S0/S1 classes, and zero collection errors; its encoded collection gate is PASS. P05 merged 35 valid v2 rollouts with five successful v3 retries: 40/40 records reload, 667 tool calls, zero collection errors, and all ten tasks have divergent trajectories. Hindsight C+U is 3.60% of observed tool time, while safe C is 0.01%; the evidence redirects the next step to one typed U-family adapter study.
 
 # Open Items / Future Extensions
 
-P04 provider smoke is complete. P05 opportunity analysis is the next step; it must preserve the `recover-accuracy-log` verifier limitation when interpreting task success and reuse opportunity. Two W2-T1 instances and any TVCache serving work remain deferred until the later gates pass.
+P05 opportunity analysis is complete. P06 should redirect to a typed adapter study for the repeated `multi-source-data-merger` S1 `exec` family, rather than starting a generic C memoizer. Two W2-T1 instances and any TVCache serving work remain deferred until the later gates pass.
 
 ## 2026-09-15 cloud and P04 checkpoint
 

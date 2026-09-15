@@ -6,6 +6,7 @@
 | 2026-09-15 | Added the P03 build and verifier failures with their final resolutions. |
 | 2026-09-15 | Recorded P04 collection preparation, cloud persistence, and current execution evidence. |
 | 2026-09-15 | Closed the v21 P04 collection issues and recorded the recover-task verifier limitation. |
+| 2026-09-15 | Recorded P05 staging fixes, provider retries, and the final typed-U redirect recommendation. |
 
 # Open Issues
 
@@ -66,3 +67,29 @@ All ten selected tasks have successful build metadata, registry manifest digests
 - **Observed:** all four `recover-accuracy-log` v21 rollouts produced complete traces, workspace archives, verifier logs, and verifier XML, but each verifier process exited 1. The task reported the expected seven output files and per-run accuracy values in its final answers, yet the unchanged upstream verifier still reported one failed test in each rollout.
 - **Scope:** The failures are isolated to the model-produced task result. Every rollout had real mutations, valid reloaded traces, H200 execution, and no collection error. No image, GPU, provider transport, or cloud persistence failure was observed.
 - **Decision:** Keep the artifacts and record verifier pass as 0/4 for this task. The current P04 gate checks artifact completeness and collection health, so v21 remains PASS. P05 must treat this task's verifier result as a data-quality limitation and avoid using it as clean task-success evidence.
+
+## P05 collection and analysis issues
+
+### Missing verifier package in first P05 stage
+
+- **Status:** resolved.
+- **Observed:** `p05-20260915-v1` entered the tool loop but ended at verifier setup with `FileNotFoundError: .../public/verifier_packages`.
+- **Resolution:** The P05 runner now copies the verified offline package tree from the P04 staging directory before creating configs. v2 and v3 stages contain the package tree.
+
+### Oversized provider context for jsonl-aggregator
+
+- **Status:** resolved for the retained retry records.
+- **Observed:** Four v2 `jsonl-aggregator` rollouts received HTTP 413 after a large filesystem result was sent back in the native tool conversation.
+- **Resolution:** The complete result remains in the trace, while provider context is capped at 12,000 characters for P05. All four v3 retries completed without collection errors.
+
+### Multiple native calls in one provider response
+
+- **Status:** resolved for the retained retry record.
+- **Observed:** `log-summary-date-ranges/r2` in v2 returned multiple native tool calls after the collector's existing retries.
+- **Resolution:** The record was rerun with the same P05 policy under v3 and completed with a valid single-call sequence. The original v2 error remains retained as evidence.
+
+### P05 opportunity result
+
+- **Status:** resolved for P05; follow-up selected.
+- **Observed:** 667 calls took 66.831 s. Hindsight C+U was 3.60%; C alone was 0.01%; U was 3.59%; eight tasks had post-divergence opportunity; task-scoped top-1 signature share was 7.95%.
+- **Decision:** The generic C continuation signal is weak. P06 should study one typed adapter for the repeated `multi-source-data-merger` S1 `exec` family (1.650 s of U time) before any memoizer or serving integration work.
