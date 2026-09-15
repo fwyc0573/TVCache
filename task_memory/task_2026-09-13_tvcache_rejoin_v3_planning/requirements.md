@@ -6,6 +6,7 @@
 | 2026-09-13 | Follow-up request authorized execution of the recorded plan, starting at P00 and continuing through the ready packets. |
 | 2026-09-15 | Recorded the CPU-master Docker limitation and the approved GPU-worker build and verifier route for P03. |
 | 2026-09-15 | Added cloud persistence and authorized P04 smoke when existing resources settle required inputs. |
+| 2026-09-15 | Added the user's request to audit P05 same-prompt sample count and its effect on reuse opportunity. |
 
 # Requirements
 
@@ -34,7 +35,11 @@
 
 - P03 source revision is pinned at `d28711d0da2675d0bb1d56de45ae5df6082438a3`.
 - Ten selected task images have successful StepBPS build records, registry manifest digests, and H200 worker verifier evidence.
-- The four P04 smoke tasks are ready to run; no provider rollout has started yet.
+- P04 v21 and P05 collection/analysis are complete. The P05 result is currently treated as a descriptive four-trajectory-per-task pilot while P06 decides whether more samples are needed.
+
+## Latest sampling review request
+
+用户对 P05 的 workload 和测试场景提出质疑，要求确认同一 task prompt 的 rollout sample 数量，并检查样本数过少是否会降低观察到重复工作和复用机会的概率。审查必须区分最终独立 trajectory 数量、每个 provider turn 的 response 数量、以及单条 trajectory 内的 sequential tool calls；在决定是否扩样前不得把当前 C/U time share 当成稳定概率。
 
 ## Acceptance Criteria
 

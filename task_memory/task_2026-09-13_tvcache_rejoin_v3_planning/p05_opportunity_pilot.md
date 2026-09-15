@@ -3,6 +3,7 @@
 | Date       | Summary of Changes |
 | ---------- | ------------------ |
 | 2026-09-15 | Started P05 opportunity-pilot preparation after the P04 v21 smoke gate passed. |
+| 2026-09-15 | Added the per-prompt sample-count limitation and P06 sampling decision. |
 
 # P05 Opportunity Pilot
 
@@ -84,3 +85,5 @@ The merged checker passed for all 40 rollouts and 667 tool calls. The full repor
 The completed-donor online view gives C+U time share of 1.81%, compared with 3.60% hindsight. Eight of ten tasks contain post-divergence C or U events. The most common prior mutation depth is 2. Task-scoped top-1 repeated signature share is 7.95%. Opportunity time is almost entirely raw S1 `exec`; observed C time is negligible.
 
 The P06 continuation signal is therefore a redirect. The generic C memoizer threshold is not met. The highest-value follow-up is one typed adapter study for the repeated `multi-source-data-merger` S1 `exec` family, which contributes 1.650 s of U time. This result does not establish safe reuse for that family; it selects the next measurement target.
+
+The four trajectories per task are sufficient for this opportunity pilot and its trajectory-divergence check, but they are a small prompt-level sample. The result must not be read as a stable estimate of future reuse probability. P06 must decide whether to add 12 trajectories per task before making a stronger frequency claim.

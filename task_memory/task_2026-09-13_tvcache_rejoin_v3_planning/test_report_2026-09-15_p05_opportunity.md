@@ -3,6 +3,7 @@
 | Date       | Summary of Changes |
 | ---------- | ------------------ |
 | 2026-09-15 | Recorded merged P05 collection validation, opportunity analysis, figures, and continuation evidence. |
+| 2026-09-15 | Added the per-prompt sample-count interpretation limit. |
 
 # P05 opportunity analysis verification
 
@@ -50,4 +51,4 @@
 
 ## Limits
 
-The collection uses one ten-task cohort and four trajectories per task. Verifier exits were 0 for 10/40, while all 40 records and artifacts passed reload checks; verifier success is not used as a filter for opportunity classification. C is an observed S0 effect match and still needs paired differential validation. U has no complete dependency/effect description and must not be treated as a cache hit.
+The collection uses one ten-task cohort and four trajectories per task. This supports a descriptive pilot but gives only six unordered trajectory pairs per task, so C/U time shares are not stable estimates of future reuse probability. Verifier exits were 0 for 10/40, while all 40 records and artifacts passed reload checks; verifier success is not used as a filter for opportunity classification. C is an observed S0 effect match and still needs paired differential validation. U has no complete dependency/effect description and must not be treated as a cache hit.

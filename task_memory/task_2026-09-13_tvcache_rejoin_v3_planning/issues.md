@@ -7,6 +7,7 @@
 | 2026-09-15 | Recorded P04 collection preparation, cloud persistence, and current execution evidence. |
 | 2026-09-15 | Closed the v21 P04 collection issues and recorded the recover-task verifier limitation. |
 | 2026-09-15 | Recorded P05 staging fixes, provider retries, and the final typed-U redirect recommendation. |
+| 2026-09-15 | Added the P05 sampling-count review and marked frequency interpretation as pending a P06 sampling decision. |
 
 # Open Issues
 
@@ -93,3 +94,10 @@ All ten selected tasks have successful build metadata, registry manifest digests
 - **Status:** resolved for P05; follow-up selected.
 - **Observed:** 667 calls took 66.831 s. Hindsight C+U was 3.60%; C alone was 0.01%; U was 3.59%; eight tasks had post-divergence opportunity; task-scoped top-1 signature share was 7.95%.
 - **Decision:** The generic C continuation signal is weak. P06 should study one typed adapter for the repeated `multi-source-data-merger` S1 `exec` family (1.650 s of U time) before any memoizer or serving integration work.
+
+### P05 per-prompt sample count
+
+- **Status:** open for P06 decision; no collection defect was found.
+- **Observed:** Each of the ten task instructions has four final rollout trajectories (`r0`–`r3`). Each API turn requests one response because the payload has no `n` field. The five v3 retries replace five failed v2 rollout slots and do not add independent samples.
+- **Impact:** Four trajectories provide only six unordered trajectory pairs per task and three possible donor trajectories for each recipient. The 667 tool events improve event coverage but do not make the prompt-level sample size large. Current C/U shares are descriptive pilot results, not stable reuse probabilities.
+- **Recommendation:** P06 must choose whether to add 12 trajectories per task (16 total) under the same policy before treating the redirect as the final workload decision, or explicitly retain the four-trajectory result as descriptive evidence only. The detailed audit is in `p05_sampling_review.md`.

@@ -30,7 +30,7 @@
 - Added `research/rejoin/scripts/check_p05.py` for 40-record reload, artifact, mutation, divergence, support-class, and collection-error checks.
 - Added `research/rejoin/scripts/analyze_p05.py` for A/B/C/U/N hindsight and completed-donor online views, time weighting, mutation-depth and support-class summaries, figures O1–O3, and at most ten serial reference attempts.
 - Local checks: all new Python files parse and compile; a 40-config prepare-only run returned `P05_PREPARED 40`; a synthetic trace classified the intended post-divergence S0 match as C. The worker chroot smoke helper was not run on CPU because it explicitly requires sudo; P04 already supplied the corresponding worker evidence.
-- P05 GPU collection and opportunity analysis are complete. Next action: create the P06 decision record for the typed `multi-source-data-merger` S1 `exec` adapter study; do not begin generic memoizer or serving integration work before that decision.
+- P05 GPU collection and opportunity analysis are complete as a descriptive pilot. Next action: create the P06 decision record for sampling adequacy and the typed `multi-source-data-merger` S1 `exec` adapter route; do not begin generic memoizer or serving integration work before that decision.
 
 ### P05 v1 staging failure (2026-09-15)
 
