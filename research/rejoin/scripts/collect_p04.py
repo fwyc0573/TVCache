@@ -345,14 +345,19 @@ def collect(config: dict, config_dir: Path, report_path: Path) -> None:
             write_json(output / "workspaces" / f"{seq:03d}.json",
                        {"before": before.to_dict(), "after": after.to_dict()})
             summary["tool_calls"] += 1
+            tool_content = json.dumps(result["result"])
+            max_tool_chars = config.get("max_tool_result_chars")
+            if max_tool_chars and len(tool_content) > max_tool_chars:
+                tool_content = (tool_content[:max_tool_chars] +
+                                f"\n[tool result truncated for provider context; full result is in trace, {len(tool_content)} chars]")
             if provider.get("response_mode") == "native_tool_call":
                 messages += [provider["native_assistant_message"],
                              {"role": "tool", "tool_call_id":
                               provider["native_tool_call"]["id"],
-                              "content": json.dumps(result["result"])}]
+                              "content": tool_content}]
             else:
                 messages += [{"role": "assistant", "content": json.dumps(action)},
-                             {"role": "user", "content": "Tool result:\n" + json.dumps(result["result"])}]
+                             {"role": "user", "content": "Tool result:\n" + tool_content}]
             write_json(output / "progress.json", summary)
             print("TOOL", row["task_id"], config["rollout_id"], seq, declaration.name,
                   result["exit_status"], flush=True)

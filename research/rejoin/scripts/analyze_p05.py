@@ -239,8 +239,10 @@ def main() -> int:
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--collection-concurrency", type=int, default=4)
     parser.add_argument("--tmp-root", type=Path, default=Path("/data/ycfeng/tmp/p05-serial-reference"))
+    parser.add_argument("--run-map", type=Path)
     args = parser.parse_args()
     tasks = read_tasks(args.manifest)
+    run_map = json.loads(args.run_map.read_text()) if args.run_map else {}
     all_events: list[dict] = []
     all_rows_hindsight, all_rows_online = [], []
     per_task = []
@@ -248,7 +250,8 @@ def main() -> int:
     for task in tasks:
         rollouts = {}
         for index in range(4):
-            directory = args.cloud_root / "rollouts/p05" / args.run_id / task / f"r{index}"
+            selected_run = run_map.get(f"{task}/r{index}", args.run_id)
+            directory = args.cloud_root / "rollouts/p05" / selected_run / task / f"r{index}"
             events = load_jsonl(directory / "trace.jsonl")
             rollouts[f"r{index}"] = events
             summary = json.loads((directory / "COMPLETE.json").read_text())
@@ -257,8 +260,8 @@ def main() -> int:
             for event in events:
                 hindsight = event_row(event, events, rollouts, online=False)
                 online = event_row(event, events, rollouts, online=True)
-                hindsight["run_id"] = args.run_id
-                online["run_id"] = args.run_id
+                hindsight["run_id"] = selected_run
+                online["run_id"] = selected_run
                 all_rows_hindsight.append(hindsight)
                 all_rows_online.append(online)
     hindsight_total = aggregate(all_rows_hindsight)

@@ -20,20 +20,21 @@ def load_tasks(path: Path) -> tuple[str, ...]:
     return tuple(row["task_id"] for row in rows if row.get("include"))
 
 
-def check(root: Path, run_id: str, tasks: tuple[str, ...]) -> dict:
+def check(root: Path, run_id: str, tasks: tuple[str, ...], run_map: dict[str, str] | None = None) -> dict:
     root = root.resolve()
     if not root.is_relative_to("/mnt/codesign-exp/ycfeng"):
         raise ValueError("Read only the personal cloud directory")
     records, problems = [], []
     for task in tasks:
         for index in range(4):
-            directory = root / "rollouts/p05" / run_id / task / f"r{index}"
+            selected_run = (run_map or {}).get(f"{task}/r{index}", run_id)
+            directory = root / "rollouts/p05" / selected_run / task / f"r{index}"
             try:
                 summary = json.loads((directory / "COMPLETE.json").read_text())
                 events = load_jsonl(directory / "trace.jsonl")
                 assert summary["task_id"] == task and summary["rollout_id"] == f"r{index}"
                 assert summary["tool_calls"] == len(events)
-                assert all(e.run_id == run_id and e.task_id == task and e.rollout_id == f"r{index}"
+                assert all(e.run_id == selected_run and e.task_id == task and e.rollout_id == f"r{index}"
                            for e in events)
                 assert not events or events[0].seq == 0
                 for artifact in ("workspace.tar.gz", "workspace.initial.json", "workspace.final.json",
@@ -85,8 +86,10 @@ def main() -> int:
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument("--run-map", type=Path)
     args = parser.parse_args()
-    result = check(args.cloud_root, args.run_id, load_tasks(args.manifest))
+    run_map = json.loads(args.run_map.read_text()) if args.run_map else None
+    result = check(args.cloud_root, args.run_id, load_tasks(args.manifest), run_map)
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     print(json.dumps({k: result[k] for k in ("status", "run_id", "expected_rollouts",

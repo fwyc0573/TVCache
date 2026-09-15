@@ -44,6 +44,8 @@
 | P05 config preparation | PASS | Output `P05_PREPARED 40`; generated stage size was 796 KiB. |
 | Synthetic C classification | PASS | `classify(...)` returned `C`; donor lookup returned the earlier rollout event. |
 | P05 path/config inspection | PASS | Config contains `phase=p05`, `expected_rollouts=40`, `check_script=check_p05.py`, and `rollouts/p05` is selected by the collector. |
+| Provider context retry fix | PASS | A fresh v3 retry of all four `jsonl-aggregator` rollouts completed with 7–12 calls and no collection errors after `max_tool_result_chars=12000`. |
+| Multiple-native-call retry | PASS | Fresh v3 `log-summary-date-ranges/r2` completed with six calls and no collection error. |
 | Existing worker chroot helper | DEFERRED | `tests/e2e/check_rejoin_tool_process.py` stopped with its explicit `Run with sudo` requirement on the CPU master. The same worker isolation and UID evidence is retained in the P04 v21 report. |
 
 ## Limits

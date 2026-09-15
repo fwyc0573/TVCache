@@ -28,6 +28,9 @@ def prepare(stage: Path, run_id: str) -> list[Path]:
     shutil.copytree(REPO / "research/rejoin", public / "rejoin", dirs_exist_ok=True,
                     ignore=shutil.ignore_patterns("__pycache__", ".pytest_cache"))
     shutil.copyfile(MANIFEST, public / "manifest.jsonl")
+    run_map = TASK_MEMORY / "p05_run_map.json"
+    if run_map.exists():
+        shutil.copyfile(run_map, public / "run_map.json")
     shutil.copytree(REPO / "tests/e2e", public / "e2e", dirs_exist_ok=True,
                     ignore=shutil.ignore_patterns("__pycache__", ".pytest_cache"))
     verifier_packages = Path("/data/ycfeng/tmp/rejoin-p04-control/public/verifier_packages")
@@ -57,6 +60,7 @@ def prepare(stage: Path, run_id: str) -> list[Path]:
                 "base_url": "https://models-proxy.stepfun-inc.com", "model": "deepseek-v4-flash",
                 "sampling": {"temperature": 0.8, "top_p": 0.95, "seed": 20260915 + index},
                 "max_tokens": 4096, "max_steps": 96, "thinking": {"type": "disabled"},
+                "max_tool_result_chars": 12000,
                 "native_tools": True, "policy": "p05-native-tools-4k",
                 "expected_rollouts": len(TASKS) * 4, "check_script": "check_p05.py",
                 "manifest_path": str(public / "manifest.jsonl"),

@@ -37,6 +37,13 @@
 - The failure is a collector staging defect, not a provider, image, GPU, mount, or cloud persistence failure. The active launcher was interrupted before submitting the remaining batch; its four submitted jobs were stopped by the Python backend on process exit.
 - The failed run id is retained as `p05-20260915-v1` evidence. The next run uses a fresh id and copies `/data/ycfeng/tmp/rejoin-p04-control/public/verifier_packages` into the stage before submission.
 
+### P05 v2 collection and v3 retries (2026-09-15)
+
+- `p05-20260915-v2` produced all 40 rollout records and 634 tool calls. The P05 artifact reload check passed for record shape and artifacts, but the gate correctly failed because four `jsonl-aggregator` records hit provider HTTP 413 and `log-summary-date-ranges/r2` returned multiple native tool calls after retries. These records remain preserved with their exact errors.
+- The v2 run otherwise completed the full cohort with real mutations and both S0/S1 classes. Verifier exits were 0 for 10/40; verifier failure is retained as task outcome data.
+- Root cause for the 413 case was oversized tool-result context sent back to the provider. Added a configurable `max_tool_result_chars=12000` context bound while retaining the complete result in the trace.
+- Fresh v3 retries succeeded for `jsonl-aggregator/r0-r3` and `log-summary-date-ranges/r2`; all five have complete trace, workspace, provider, and verifier artifacts. A run map will combine these five v3 records with the 35 valid v2 records for the final P05 check and analysis.
+
 ## Cloud persistence and P04 continuation (2026-09-15)
 
 - User authorized cloud persistence below `ycfeng` and automatic P04 execution if available resources settle the required inputs.
