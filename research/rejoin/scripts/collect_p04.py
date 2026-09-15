@@ -154,7 +154,7 @@ def complete(config: dict, key: str, messages: list, output: Path, index: int) -
             if not isinstance(arguments, dict) or not isinstance(function.get("name"), str):
                 raise ValueError("Provider native tool call is malformed")
             meta.update(response_mode="native_tool_call", native_tool_call=call,
-                        content_shape="native_tool_call")
+                        native_assistant_message=message, content_shape="native_tool_call")
             append_json(output / "provider.jsonl", meta)
             return {"tool": function["name"], "arguments": arguments, "final_answer": None}, meta
         if choice.get("finish_reason") != "stop":
@@ -308,8 +308,7 @@ def collect(config: dict, config_dir: Path, report_path: Path) -> None:
                        {"before": before.to_dict(), "after": after.to_dict()})
             summary["tool_calls"] += 1
             if provider.get("response_mode") == "native_tool_call":
-                messages += [{"role": "assistant", "content": None,
-                              "tool_calls": [provider["native_tool_call"]]},
+                messages += [provider["native_assistant_message"],
                              {"role": "tool", "tool_call_id":
                               provider["native_tool_call"]["id"],
                               "content": json.dumps(result["result"])}]
