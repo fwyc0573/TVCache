@@ -270,15 +270,15 @@ def main() -> int:
     cu_rows = [row for row in all_rows_hindsight if row["class"] in {"C", "U"}]
     grouped = defaultdict(list)
     for row in all_rows_hindsight:
-        grouped[row["invocation_signature"]].append(row)
+        grouped[(row["task_id"], row["invocation_signature"])].append(row)
     top = []
-    for signature, rows in grouped.items():
+    for (task_id, signature), rows in grouped.items():
         if len(rows) < 2:
             continue
         top.append({"invocation_signature": signature, "tool": rows[0]["tool"],
                     "support_class": rows[0]["support_class"], "calls": len(rows),
                     "time_ns": sum(row["duration_ns"] for row in rows),
-                    "task_ids": sorted({row["task_id"] for row in rows})})
+                    "task_ids": [task_id]})
     top.sort(key=lambda row: (-row["time_ns"], row["invocation_signature"]))
     for rank, row in enumerate(top, start=1):
         row["rank"] = rank
