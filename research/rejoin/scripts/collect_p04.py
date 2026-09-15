@@ -252,7 +252,7 @@ def collect(config: dict, config_dir: Path, report_path: Path) -> None:
     (output / "provider").mkdir()
     write_json(output / "config.json", config)
     if row["task_id"] == "polyglot-c-py" and config["rollout_id"] == "r0":
-        code_output = root / "code" / config["run_id"]
+        code_output = root / "code" / (config["run_id"] if phase == "p04" else phase) / config["run_id"]
         code_output.mkdir(parents=True, exist_ok=True)
         for name, source in (("rejoin", SCRIPT_ROOT),
                              ("verifier_packages", config_dir / "public/verifier_packages")):
