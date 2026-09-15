@@ -116,7 +116,8 @@ def complete(config: dict, key: str, messages: list, output: Path, index: int) -
                           "include reasoning or prose.")
             request_messages = [*messages, {"role": "user", "content": retry_text}]
             payload["messages"] = request_messages
-            payload["max_tokens"] = min(config["max_tokens"], 384 if attempt == 1 else 256)
+            retry_budget = (1024 if native_tools else 384) if attempt == 1 else (768 if native_tools else 256)
+            payload["max_tokens"] = min(config["max_tokens"], retry_budget)
             payload["temperature"] = 0.0
             payload["top_p"] = 1.0
         started = time.time_ns()
@@ -145,14 +146,29 @@ def complete(config: dict, key: str, messages: list, output: Path, index: int) -
         if native_tools and message.get("tool_calls"):
             calls = message["tool_calls"]
             if len(calls) != 1:
+                meta.update(response_mode="native_tool_call_invalid", content_shape="native_tool_call",
+                            native_call_count=len(calls))
+                append_json(output / "provider.jsonl", meta)
+                if attempt < 2:
+                    continue
                 raise ValueError("Provider returned more than one native tool call")
             call = calls[0]
             function = call.get("function", {})
             try:
                 arguments = json.loads(function["arguments"])
             except (KeyError, TypeError, json.JSONDecodeError) as error:
+                meta.update(response_mode="native_tool_call_invalid", content_shape="native_tool_call",
+                            native_args_error=str(error))
+                append_json(output / "provider.jsonl", meta)
+                if attempt < 2:
+                    continue
                 raise ValueError("Provider native tool arguments are invalid") from error
             if not isinstance(arguments, dict) or not isinstance(function.get("name"), str):
+                meta.update(response_mode="native_tool_call_invalid", content_shape="native_tool_call",
+                            native_args_error="call is malformed")
+                append_json(output / "provider.jsonl", meta)
+                if attempt < 2:
+                    continue
                 raise ValueError("Provider native tool call is malformed")
             native_message = dict(message)
             native_message.setdefault("reasoning_content", "")
