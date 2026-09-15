@@ -92,50 +92,66 @@ def run_tool(action: dict, rootfs: Path, env: dict) -> dict:
 
 
 def complete(config: dict, key: str, messages: list, output: Path, index: int) -> tuple[dict, dict]:
-    request_id = uuid4().hex
-    payload = {"model": config["model"], "messages": messages,
-               **config["sampling"], "max_tokens": config["max_tokens"],
-               "response_format": {"type": "json_object"}, "tool_choice": "none",
-               "thinking": config.get("thinking", {"type": "disabled"}),
-               "reasoning_effort": config.get("reasoning_effort", "low")}
-    started = time.time_ns()
-    request = urllib.request.Request(
-        config["base_url"].rstrip("/") + "/v1/chat/completions",
-        data=json.dumps(payload).encode(), method="POST",
-        headers={"Content-Type": "application/json", "Authorization": "Bearer " + key},
-    )
-    write_json(output / "provider" / f"{index:03d}.request.json",
-               {"request_id": request_id, "start_epoch_ns": started, "payload": payload})
-    with urllib.request.urlopen(request, timeout=180) as response:
-        body = json.load(response)
-        status = response.status
-    ended = time.time_ns()
-    write_json(output / "provider" / f"{index:03d}.response.json", body)
-    choice = body["choices"][0]
-    meta = {"request_id": request_id, "response_id": body.get("id"),
-            "model": body.get("model"), "requested_model": config["model"],
-            "base_url": config["base_url"], "sampling": config["sampling"],
-            "seed_support": "accepted; deterministic behavior not established",
-            "usage": body.get("usage"), "finish_reason": choice.get("finish_reason"),
-            "start_epoch_ns": started, "end_epoch_ns": ended, "http_status": status}
-    if choice.get("finish_reason") != "stop":
-        raise ValueError(f"Provider finish reason: {choice.get('finish_reason')}")
-    content = choice["message"].get("content")
-    if not isinstance(content, str):
-        raise ValueError("Provider message content must be a string")
-    parsed = json.loads(content)
-    content_shape = "object"
-    if isinstance(parsed, list) and len(parsed) == 1 and isinstance(parsed[0], dict):
-        # Some compatible endpoints wrap a single requested action in an array.
-        # Preserve the wire-shape evidence while accepting the unambiguous action.
-        parsed = parsed[0]
-        content_shape = "singleton_array_unwrapped"
-    meta["content_shape"] = content_shape
-    append_json(output / "provider.jsonl", meta)
-    action = parsed
-    if not isinstance(action, dict):
-        raise ValueError("Provider action must be a JSON object")
-    return action, meta
+    for attempt in range(3):
+        request_id = uuid4().hex
+        request_messages = messages
+        payload = {"model": config["model"], "messages": request_messages,
+                   **config["sampling"], "max_tokens": config["max_tokens"],
+                   "response_format": {"type": "json_object"}, "tool_choice": "none",
+                   "thinking": config.get("thinking", {"type": "disabled"}),
+                   "reasoning_effort": config.get("reasoning_effort", "low")}
+        if attempt:
+            request_messages = [*messages, {"role": "user", "content":
+                "The previous response was truncated. Return one short JSON object "
+                "for the next action now; do not include reasoning or prose."}]
+            payload["messages"] = request_messages
+            payload["max_tokens"] = min(config["max_tokens"], 1024 if attempt == 1 else 512)
+            payload["temperature"] = 0.0
+            payload["top_p"] = 1.0
+        started = time.time_ns()
+        request = urllib.request.Request(
+            config["base_url"].rstrip("/") + "/v1/chat/completions",
+            data=json.dumps(payload).encode(), method="POST",
+            headers={"Content-Type": "application/json", "Authorization": "Bearer " + key},
+        )
+        stem = f"{index:03d}" if attempt == 0 else f"{index:03d}.retry{attempt}"
+        write_json(output / "provider" / f"{stem}.request.json",
+                   {"request_id": request_id, "start_epoch_ns": started, "payload": payload})
+        with urllib.request.urlopen(request, timeout=180) as response:
+            body = json.load(response)
+            status = response.status
+        ended = time.time_ns()
+        write_json(output / "provider" / f"{stem}.response.json", body)
+        choice = body["choices"][0]
+        meta = {"request_id": request_id, "response_id": body.get("id"),
+                "model": body.get("model"), "requested_model": config["model"],
+                "base_url": config["base_url"], "sampling": config["sampling"],
+                "seed_support": "accepted; deterministic behavior not established",
+                "usage": body.get("usage"), "finish_reason": choice.get("finish_reason"),
+                "start_epoch_ns": started, "end_epoch_ns": ended, "http_status": status,
+                "attempt": attempt}
+        if choice.get("finish_reason") != "stop":
+            meta["content_shape"] = "unavailable"
+            append_json(output / "provider.jsonl", meta)
+            if choice.get("finish_reason") == "length" and attempt < 2:
+                continue
+            raise ValueError(f"Provider finish reason: {choice.get('finish_reason')}")
+        content = choice["message"].get("content")
+        if not isinstance(content, str):
+            raise ValueError("Provider message content must be a string")
+        parsed = json.loads(content)
+        content_shape = "object"
+        if isinstance(parsed, list) and len(parsed) == 1 and isinstance(parsed[0], dict):
+            # Some compatible endpoints wrap a single requested action in an array.
+            # Preserve the wire-shape evidence while accepting the unambiguous action.
+            parsed = parsed[0]
+            content_shape = "singleton_array_unwrapped"
+        meta["content_shape"] = content_shape
+        append_json(output / "provider.jsonl", meta)
+        if not isinstance(parsed, dict):
+            raise ValueError("Provider action must be a JSON object")
+        return parsed, meta
+    raise AssertionError("Provider retry loop did not return")
 
 
 def collect(config: dict, config_dir: Path, report_path: Path) -> None:
