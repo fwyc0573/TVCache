@@ -107,6 +107,7 @@ def complete(config: dict, key: str, messages: list, output: Path, index: int) -
                 "parameters": declaration["input_schema"]}}
                 for declaration in tool_declarations()]
             payload["tool_choice"] = "auto"
+            payload["parallel_tool_calls"] = False
         if attempt:
             retry_text = ("The previous response was truncated. Return one short native "
                           "function call for the next action now; do not include reasoning "
