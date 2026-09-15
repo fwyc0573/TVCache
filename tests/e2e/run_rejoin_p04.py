@@ -48,8 +48,8 @@ def prepare(stage: Path, run_id: str) -> list[Path]:
                 "run_id": run_id, "rollout_id": f"r{index}", "task": row,
                 "base_url": "https://models-proxy.stepfun-inc.com", "model": "deepseek-v4-flash",
                 "sampling": {"temperature": 0.8, "top_p": 0.95, "seed": 20260915 + index},
-                "max_tokens": 2048, "max_steps": 64, "thinking": {"type": "disabled"},
-                "policy": "p04-v4-disable-thinking-2k-cleanup",
+                "max_tokens": 2048, "max_steps": 64, "reasoning_effort": "none",
+                "policy": "p04-v5-no-reasoning-2k-cleanup",
             }
             path = stage / f"{run_id}.{row['task_id']}.r{index}.json"
             path.write_text(json.dumps(config, indent=2) + "\n")
