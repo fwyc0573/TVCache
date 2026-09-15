@@ -15,8 +15,9 @@
 | 2026-09-15 | Recorded P04 collection preparation, cloud persistence, and current execution evidence. |
 | 2026-09-15 | Investigated v18 native-call truncation, compared provider budgets, updated P04 to a 4096-token primary budget with 4096/3072 retries, and prepared v19 configs. |
 | 2026-09-15 | Ran v20 on H200/step_main; long native writes completed, but two late provider HTTP 503 responses became collection errors. Added transient HTTP retries for the next run. |
+| 2026-09-15 | Completed P04 v21 on H200/step_main: the collection gate passed for all 16 rollouts with zero collection errors. |
 
-# Status: in-progress (P04 provider smoke is pending)
+# Status: completed through P04 (P04 provider smoke PASS; P05 pending)
 
 ## Cloud persistence and P04 continuation (2026-09-15)
 
@@ -119,9 +120,9 @@ All ten tasks have `solution_exit_code=0`, `verifier_exit_code=0`, and worker st
 
 The complete solution logs, verifier logs, `nvidia-smi` logs, and JSON summaries are in `/data/ycfeng/tmp/rejoin-verifier-logs/`. The seven S0 tools and mutating S1 `exec` direct checks pass in `research/rejoin/tests/test_tools.py`.
 
-### Decision
+### Decision at P03 completion
 
-P03 is complete. P04 may start with the four verified smoke tasks. A provider endpoint, model profile, and rollout artifact location are still required before real API collection.
+P03 was complete at this checkpoint. P04 could start with the four verified smoke tasks; the provider endpoint, model profile, and rollout artifact location were then supplied and used by the completed v21 run.
 
 ## P03 disk cleanup (2026-09-15)
 
@@ -170,3 +171,12 @@ P03 is complete. P04 may start with the four verified smoke tasks. A provider en
 ## FIFO queue recheck (2026-09-15)
 
 - Exact-job inspection still reports `exp-0915-141415-207218` as `Pending` / `RJob is queuing` in `step-main-default`; platform message remains `Insufficient GPU quota`, `H200=0`. This is an accepted queued state under the clarified rule. The first launcher and continuation controller remain alive; no duplicate job was submitted.
+
+## P04 v21 final execution (2026-09-15)
+
+- The final detached run is `p04-20260915-v21`. The retained local summary is `/data/ycfeng/tmp/rejoin-p04-control/p04-20260915-v21.smoke.json`, and the cloud summary is `/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/reports/p04-20260915-v21.smoke.json`. The generated Markdown summary is present beside each JSON report.
+- The run used the pinned four-task cohort, four fresh rollouts per task, native function calls, `max_tokens=4096`, `max_steps=96`, `parallel_tool_calls=false`, and the transient provider retry policy. It ran on H200 with `step_main` through the local personal StepMind Python `RJobBackend` and persisted rollout data below the personal cloud root.
+- All 16 rollout records and traces reload successfully. The run produced 412 tool calls, 16/16 mutation rollouts, four different trajectories per task, both S0 and S1 support classes, and zero collection errors. The encoded P04 smoke gate is PASS.
+- Verifier exits were 0 for 10/16 rollouts. `wasm-pipeline` and `multi-source-data-merger` passed 4/4; `polyglot-c-py` passed 2/4, with `r1` reaching `step_limit` and `r3` failing its verifier; `recover-accuracy-log` failed its verifier 4/4. All 16 still have complete trace, verifier, log, and workspace archive artifacts.
+- The `recover-accuracy-log` result is a task-level data-quality limitation for P05 analysis. It is not a collection, image, GPU, or cloud persistence failure, and the current P04 gate intentionally does not require a verifier pass ratio.
+- The v20 HTTP 503 issue is resolved for collection purposes: v21 recorded zero collection errors after the collector retry policy was enabled. P05 may now begin opportunity analysis while preserving the verifier limitation in its interpretation.

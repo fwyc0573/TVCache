@@ -5,6 +5,7 @@
 | 2026-09-15 | Recorded the provider, collection policy, execution environment, and smoke checks. |
 | 2026-09-15 | Switched P04 to native function calls and raised the long-action token budget after v18 truncation evidence. |
 | 2026-09-15 | Added retries for transient provider HTTP 429 and 5xx responses after v20 observed two 503 collection errors. |
+| 2026-09-15 | Completed P04 v21: 16 rollouts passed the collection gate with zero collection errors. |
 
 # P04 provider smoke
 
@@ -44,3 +45,18 @@ Smoke checks:
 7. Collection errors are shown explicitly and investigated before treating the dataset as ready.
 
 No caching or reference-solution actions are inserted to meet these checks. A failed smoke check requires a documented policy or cohort adjustment before P05.
+
+## P04 v21 final result
+
+Run `p04-20260915-v21` completed on H200 with `step_main` through the local personal StepMind Python `RJobBackend`. The local smoke report is `/data/ycfeng/tmp/rejoin-p04-control/p04-20260915-v21.smoke.json`; the retained cloud report is `/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/reports/p04-20260915-v21.smoke.json`.
+
+All 16 rollout records and traces reload successfully. The run contains 412 tool calls, 16/16 rollouts with real workspace mutations, four distinct trajectories for each task, and both S0 and S1 support classes. There are zero collection errors, and every rollout has its provider trace, verifier files, and workspace archive. The encoded P04 smoke gate is **PASS**.
+
+| Task | Verifier passes | Tool calls | Outcome detail |
+| --- | ---: | ---: | --- |
+| `wasm-pipeline` | 4/4 | 13, 37, 37, 33 | All four ended with `final_answer`. |
+| `polyglot-c-py` | 2/4 | 10, 96, 54, 28 | `r1` reached `step_limit`; `r3` ended with a verifier failure. |
+| `multi-source-data-merger` | 4/4 | 14, 17, 16, 13 | All four ended with `final_answer`. |
+| `recover-accuracy-log` | 0/4 | 8, 12, 12, 12 | All artifacts are complete, but all four verifier processes exited 1. |
+
+The aggregate verifier result is 10/16. The four `recover-accuracy-log` failures are recorded as task-level outcomes for later P05 data-quality analysis. They do not indicate an image, GPU, trace collection, or cloud persistence failure. P04 only requires complete verifier artifacts and a clean collection gate, so this limitation does not overturn the v21 P04 PASS. P05 must retain the verifier limitation when interpreting task success or reuse opportunity.
