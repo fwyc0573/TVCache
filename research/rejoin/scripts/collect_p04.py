@@ -96,6 +96,7 @@ def complete(config: dict, key: str, messages: list, output: Path, index: int) -
     payload = {"model": config["model"], "messages": messages,
                **config["sampling"], "max_tokens": config["max_tokens"],
                "response_format": {"type": "json_object"}, "tool_choice": "none",
+               "thinking": config.get("thinking", {"type": "disabled"}),
                "reasoning_effort": config.get("reasoning_effort", "low")}
     started = time.time_ns()
     request = urllib.request.Request(
