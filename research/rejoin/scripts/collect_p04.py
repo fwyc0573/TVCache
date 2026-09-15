@@ -95,14 +95,25 @@ def complete(config: dict, key: str, messages: list, output: Path, index: int) -
     for attempt in range(3):
         request_id = uuid4().hex
         request_messages = messages
+        native_tools = config.get("native_tools", False)
         payload = {"model": config["model"], "messages": request_messages,
                **config["sampling"], "max_tokens": config["max_tokens"],
                "response_format": {"type": "json_object"}, "tool_choice": "none",
                "thinking": config.get("thinking", {"type": "disabled"})}
+        if native_tools:
+            payload.pop("response_format")
+            payload["tools"] = [{"type": "function", "function": {
+                "name": declaration["name"], "description": declaration["description"],
+                "parameters": declaration["input_schema"]}}
+                for declaration in tool_declarations()]
+            payload["tool_choice"] = "auto"
         if attempt:
-            request_messages = [*messages, {"role": "user", "content":
-                "The previous response was truncated. Return one short JSON object "
-                "for the next action now; do not include reasoning or prose."}]
+            retry_text = ("The previous response was truncated. Return one short native "
+                          "function call for the next action now; do not include reasoning "
+                          "or prose.") if native_tools else ("The previous response was truncated. "
+                          "Return one short JSON object for the next action now; do not "
+                          "include reasoning or prose.")
+            request_messages = [*messages, {"role": "user", "content": retry_text}]
             payload["messages"] = request_messages
             payload["max_tokens"] = min(config["max_tokens"], 384 if attempt == 1 else 256)
             payload["temperature"] = 0.0
@@ -122,6 +133,7 @@ def complete(config: dict, key: str, messages: list, output: Path, index: int) -
         ended = time.time_ns()
         write_json(output / "provider" / f"{stem}.response.json", body)
         choice = body["choices"][0]
+        message = choice.get("message", {})
         meta = {"request_id": request_id, "response_id": body.get("id"),
                 "model": body.get("model"), "requested_model": config["model"],
                 "base_url": config["base_url"], "sampling": config["sampling"],
@@ -129,17 +141,43 @@ def complete(config: dict, key: str, messages: list, output: Path, index: int) -
                 "usage": body.get("usage"), "finish_reason": choice.get("finish_reason"),
                 "start_epoch_ns": started, "end_epoch_ns": ended, "http_status": status,
                 "attempt": attempt}
+        if native_tools and message.get("tool_calls"):
+            calls = message["tool_calls"]
+            if len(calls) != 1:
+                raise ValueError("Provider returned more than one native tool call")
+            call = calls[0]
+            function = call.get("function", {})
+            try:
+                arguments = json.loads(function["arguments"])
+            except (KeyError, TypeError, json.JSONDecodeError) as error:
+                raise ValueError("Provider native tool arguments are invalid") from error
+            if not isinstance(arguments, dict) or not isinstance(function.get("name"), str):
+                raise ValueError("Provider native tool call is malformed")
+            meta.update(response_mode="native_tool_call", native_tool_call=call,
+                        content_shape="native_tool_call")
+            append_json(output / "provider.jsonl", meta)
+            return {"tool": function["name"], "arguments": arguments, "final_answer": None}, meta
         if choice.get("finish_reason") != "stop":
             meta["content_shape"] = "unavailable"
             append_json(output / "provider.jsonl", meta)
             if choice.get("finish_reason") == "length" and attempt < 2:
                 continue
             raise ValueError(f"Provider finish reason: {choice.get('finish_reason')}")
-        content = choice["message"].get("content")
+        content = message.get("content")
         if not isinstance(content, str):
             raise ValueError("Provider message content must be a string")
+        if native_tools and content.strip():
+            try:
+                parsed = json.loads(content)
+            except json.JSONDecodeError:
+                meta.update(response_mode="native_final_text", content_shape="text")
+                append_json(output / "provider.jsonl", meta)
+                return {"tool": None, "arguments": {}, "final_answer": content.strip()}, meta
+        else:
+            parsed = None
         try:
-            parsed = json.loads(content)
+            if parsed is None:
+                parsed = json.loads(content)
         except json.JSONDecodeError as error:
             meta["content_shape"] = "invalid_json"
             meta["parse_error"] = str(error)
@@ -155,6 +193,9 @@ def complete(config: dict, key: str, messages: list, output: Path, index: int) -
             content_shape = "singleton_array_unwrapped"
         meta["content_shape"] = content_shape
         append_json(output / "provider.jsonl", meta)
+        if native_tools and isinstance(parsed, str):
+            meta["response_mode"] = "native_final_text"
+            return {"tool": None, "arguments": {}, "final_answer": parsed}, meta
         if not isinstance(parsed, dict) or not {"tool", "arguments", "final_answer"}.issubset(parsed):
             if attempt < 2:
                 continue
@@ -216,6 +257,14 @@ def collect(config: dict, config_dir: Path, report_path: Path) -> None:
         "The evaluator runs after your final answer. Available tools:\n"
         + json.dumps(tool_declarations())
     )
+    if config.get("native_tools"):
+        instruction = (
+            "Complete the task by inspecting the available files, making the necessary edits, "
+            "and checking your result. Use the provided native filesystem function tools for "
+            "every action. When done, return a brief final text. The writable workspace is "
+            "/app; system packages are read-only. Before finishing, remove temporary helper "
+            "files and binaries unless the task explicitly requires them."
+        )
     messages = [{"role": "system", "content": instruction},
                 {"role": "user", "content": row["instruction"]}]
     credential = json.loads((config_dir / "private/provider.json").read_text())
@@ -258,8 +307,15 @@ def collect(config: dict, config_dir: Path, report_path: Path) -> None:
             write_json(output / "workspaces" / f"{seq:03d}.json",
                        {"before": before.to_dict(), "after": after.to_dict()})
             summary["tool_calls"] += 1
-            messages += [{"role": "assistant", "content": json.dumps(action)},
-                         {"role": "user", "content": "Tool result:\n" + json.dumps(result["result"])}]
+            if provider.get("response_mode") == "native_tool_call":
+                messages += [{"role": "assistant", "content": None,
+                              "tool_calls": [provider["native_tool_call"]]},
+                             {"role": "tool", "tool_call_id":
+                              provider["native_tool_call"]["id"],
+                              "content": json.dumps(result["result"])}]
+            else:
+                messages += [{"role": "assistant", "content": json.dumps(action)},
+                             {"role": "user", "content": "Tool result:\n" + json.dumps(result["result"])}]
             write_json(output / "progress.json", summary)
             print("TOOL", row["task_id"], config["rollout_id"], seq, declaration.name,
                   result["exit_status"], flush=True)

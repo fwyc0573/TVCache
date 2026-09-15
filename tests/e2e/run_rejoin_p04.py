@@ -49,7 +49,8 @@ def prepare(stage: Path, run_id: str) -> list[Path]:
                 "base_url": "https://models-proxy.stepfun-inc.com", "model": "deepseek-v4-flash",
                 "sampling": {"temperature": 0.8, "top_p": 0.95, "seed": 20260915 + index},
                 "max_tokens": 512, "max_steps": 96, "thinking": {"type": "disabled"},
-                "policy": "p04-v9-disabled-thinking-512-cleanup",
+                "native_tools": True,
+                "policy": "p04-v10-native-tools-512-cleanup",
             }
             path = stage / f"{run_id}.{row['task_id']}.r{index}.json"
             path.write_text(json.dumps(config, indent=2) + "\n")
