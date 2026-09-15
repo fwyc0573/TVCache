@@ -105,7 +105,7 @@ def complete(config: dict, key: str, messages: list, output: Path, index: int) -
                 "The previous response was truncated. Return one short JSON object "
                 "for the next action now; do not include reasoning or prose."}]
             payload["messages"] = request_messages
-            payload["max_tokens"] = min(config["max_tokens"], 1024 if attempt == 1 else 512)
+            payload["max_tokens"] = min(config["max_tokens"], 384 if attempt == 1 else 256)
             payload["temperature"] = 0.0
             payload["top_p"] = 1.0
         started = time.time_ns()
