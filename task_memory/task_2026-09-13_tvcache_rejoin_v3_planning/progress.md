@@ -18,8 +18,9 @@
 | 2026-09-15 | Completed P04 v21 on H200/step_main: the collection gate passed for all 16 rollouts with zero collection errors. |
 | 2026-09-15 | Started P05: added phase-aware collection, ten-task runner, 40-rollout aggregate checker, opportunity analyzer, and P05 preparation record. |
 | 2026-09-15 | Aborted the first P05 launcher after all started workers exposed a missing verifier-package staging path; retained logs and fixed the runner to copy the verified package tree before the next run. |
+| 2026-09-15 | Completed the merged P05 collection and analysis; recorded the typed U-family redirect for P06. |
 
-# Status: P05 in progress (P04 provider smoke PASS; collection and analysis pending)
+# Status: P05 complete (P04 smoke PASS; P05 collection, analysis, and cloud archive PASS)
 
 ## P05 preparation (2026-09-15)
 
@@ -29,7 +30,7 @@
 - Added `research/rejoin/scripts/check_p05.py` for 40-record reload, artifact, mutation, divergence, support-class, and collection-error checks.
 - Added `research/rejoin/scripts/analyze_p05.py` for A/B/C/U/N hindsight and completed-donor online views, time weighting, mutation-depth and support-class summaries, figures O1–O3, and at most ten serial reference attempts.
 - Local checks: all new Python files parse and compile; a 40-config prepare-only run returned `P05_PREPARED 40`; a synthetic trace classified the intended post-divergence S0 match as C. The worker chroot smoke helper was not run on CPU because it explicitly requires sudo; P04 already supplied the corresponding worker evidence.
-- No P05 GPU rollout or opportunity result is claimed yet. Next action: create the P05 cloud menu, submit the local StepMind Python `RJobBackend` launcher, and retain its exact job names and queue state.
+- P05 GPU collection and opportunity analysis are complete. Next action: create the P06 decision record for the typed `multi-source-data-merger` S1 `exec` adapter study; do not begin generic memoizer or serving integration work before that decision.
 
 ### P05 v1 staging failure (2026-09-15)
 

@@ -7,12 +7,13 @@
 | 2026-09-15 | Recorded P04 collection preparation, cloud persistence, and current execution evidence. |
 | 2026-09-15 | Closed P04 v21 smoke and started P05 opportunity-pilot preparation. |
 | 2026-09-15 | Completed P05 merged opportunity analysis; P06 is ready for a typed U-family redirect decision. |
+| 2026-09-15 | Synchronized the packet status indexes after the P05 merge and push. |
 
 # ReJoin v3 Execution Plan
 
 ## Current status
 
-The user has authorized execution. P00, P01, P02, P03, and P04 are complete; P05 is in progress with the verified provider, ten-task cohort, and cloud storage. The source of truth remains `draft-plan/TVCache_ReJoin_Codex_Plan_v3_ZH.md`, originally pinned at `43cf9d6a779eb5149e0fae50b9a3a891dcbaed6f`; the current checkout includes the execution evidence commits.
+The user has authorized execution. P00, P01, P02, P03, P04, and P05 are complete; P06 is pending as the typed U-family redirect decision. The source of truth remains `draft-plan/TVCache_ReJoin_Codex_Plan_v3_ZH.md`, originally pinned at `43cf9d6a779eb5149e0fae50b9a3a891dcbaed6f`; the current checkout includes the execution evidence commits.
 
 ## Execution status
 

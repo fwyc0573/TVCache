@@ -6,6 +6,7 @@
 | 2026-09-13 | Updated the index to reflect execution through P02 and the P03 input audit. |
 | 2026-09-15 | Recorded P03 runtime image builds, registry digests, verifier passes, and the four-task smoke readiness result. |
 | 2026-09-15 | Recorded P04 collection preparation, cloud persistence, and current execution evidence. |
+| 2026-09-15 | Recorded P05 completion and the P06 typed U-family redirect. |
 
 # Task Plan Index
 
@@ -22,8 +23,9 @@ Translate `draft-plan/TVCache_ReJoin_Codex_Plan_v3_ZH.md` into durable task reco
 | P02 research harness | complete | `p02_harness/` and `test_report_2026-09-13_p02_harness.md` |
 | P03 cohort/tool surface | complete | `rejoin_w1_candidate_manifest.jsonl`, `p03_source_pin.md`, `test_report_2026-09-15_p03_gpu_image_build.md`, and the eight-tool implementation |
 | Cloud persistence | complete | `cloud_storage.md` and `test_report_2026-09-15_cloud_persistence.md` |
-| P04 | in-progress | `p04_smoke.md`; first corrected worker is queued for H200 capacity |
-| P05–P08 | pending | Packet dependencies and M0/M1 gates |
+| P04 | complete | `p04_smoke.md` and `test_report_2026-09-15_p04_smoke_v21.md` |
+| P05 | complete | `p05_opportunity_pilot.md`, merged opportunity report, and `test_report_2026-09-15_p05_opportunity.md` |
+| P06–P08 | pending | Packet dependencies and M0/M1 gates |
 
 ## Dependency map
 
