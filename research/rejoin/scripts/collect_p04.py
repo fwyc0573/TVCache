@@ -95,7 +95,8 @@ def complete(config: dict, key: str, messages: list, output: Path, index: int) -
     request_id = uuid4().hex
     payload = {"model": config["model"], "messages": messages,
                **config["sampling"], "max_tokens": config["max_tokens"],
-               "response_format": {"type": "json_object"}, "tool_choice": "none"}
+               "response_format": {"type": "json_object"}, "tool_choice": "none",
+               "thinking": config.get("thinking", {"type": "disabled"})}
     started = time.time_ns()
     request = urllib.request.Request(
         config["base_url"].rstrip("/") + "/v1/chat/completions",
@@ -173,7 +174,9 @@ def collect(config: dict, config_dir: Path, report_path: Path) -> None:
         "Your writable workspace is /app; TMPDIR is available for temporary files. "
         "System packages are read-only; create a virtual environment under /app if needed. "
         "Keep each exec timeout at or below 120 seconds. Do not search for hidden tests or "
-        "reference solutions. The evaluator runs after your final answer. Available tools:\n"
+        "reference solutions. Before final_answer, remove temporary helper files and binaries "
+        "unless the task explicitly requires them, and leave exactly the requested deliverables. "
+        "The evaluator runs after your final answer. Available tools:\n"
         + json.dumps(tool_declarations())
     )
     messages = [{"role": "system", "content": instruction},
