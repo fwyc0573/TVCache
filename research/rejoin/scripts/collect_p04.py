@@ -139,7 +139,15 @@ def complete(config: dict, key: str, messages: list, output: Path, index: int) -
         content = choice["message"].get("content")
         if not isinstance(content, str):
             raise ValueError("Provider message content must be a string")
-        parsed = json.loads(content)
+        try:
+            parsed = json.loads(content)
+        except json.JSONDecodeError as error:
+            meta["content_shape"] = "invalid_json"
+            meta["parse_error"] = str(error)
+            append_json(output / "provider.jsonl", meta)
+            if attempt < 2:
+                continue
+            raise ValueError(f"Provider action is invalid JSON: {error}") from error
         content_shape = "object"
         if isinstance(parsed, list) and len(parsed) == 1 and isinstance(parsed[0], dict):
             # Some compatible endpoints wrap a single requested action in an array.
@@ -148,8 +156,10 @@ def complete(config: dict, key: str, messages: list, output: Path, index: int) -
             content_shape = "singleton_array_unwrapped"
         meta["content_shape"] = content_shape
         append_json(output / "provider.jsonl", meta)
-        if not isinstance(parsed, dict):
-            raise ValueError("Provider action must be a JSON object")
+        if not isinstance(parsed, dict) or not {"tool", "arguments", "final_answer"}.issubset(parsed):
+            if attempt < 2:
+                continue
+            raise ValueError("Provider action must contain tool, arguments, and final_answer")
         return parsed, meta
     raise AssertionError("Provider retry loop did not return")
 
