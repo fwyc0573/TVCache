@@ -15,6 +15,17 @@
 
 # Status: in-progress (P04 provider smoke is pending)
 
+## Cloud persistence and P04 continuation (2026-09-15)
+
+- User authorized cloud persistence below `ycfeng` and automatic P04 execution if available resources settle the required inputs.
+- Read the StepMind worker skill, Python RJobBackend runbook, and Docker handbook. Reuse H200/step_main and personal auth; dynamically resolve local NFS address.
+- Existing StepCode configuration and the repository's tested `deepseek-v4-flash` provider route were located. A fresh preflight will settle current access before collecting rollouts.
+- Storage execution and acceptance are recorded in `cloud_storage.md`. No new task-memory directory is created locally.
+- Local staging completed: 67 files, 132,111,680 bytes, ten selected image digests. Fresh provider preflight returned HTTP 200 and valid JSON at `https://models-proxy.stepfun-inc.com` with `deepseek-v4-flash`; no user input is missing.
+- First cloud launcher exited before job creation with `KeyError: 'EXP_ID'`. Added the experiment identifier required by the Python backend and retained the failure log under `/data/ycfeng/tmp/rejoin-p04-control/`.
+- Cloud job `exp-0915-135631-557982` reached an H200 node with the correct local mount, then failed before copying files because the task image had no `nvidia-smi`. P03 logs contain the same missing executable; P03 verifier passes remain valid, while its GPU identity is supported by platform placement rather than a successful GPU command. Use the handbook's verified full worker image for storage and request NVIDIA utility support for task workers.
+- The CPU kernel is 5.10 and does not provide Landlock. P04 uses a disposable filesystem with `chroot`, an unprivileged tool user, and disabled privilege elevation. Mounted controller data is absent from that filesystem. Verifier packages are prepared on the CPU through the company mirror.
+
 ## Steps
 
 | Step | Status | Evidence |
@@ -115,3 +126,9 @@ P03 is complete. P04 may start with the four verified smoke tasks. A provider en
 - Retained the final context-free Dockerfiles, build snapshots, registry digest snapshot, verifier logs, and runner v5 because they support review or P04 preparation.
 - Removed 28 archived P03 intermediates: failed gcode/wasm result snapshots, superseded build and worker probe scripts/logs, and generated Python cache directories. Their causes and final fixes are recorded in `issues.md` and the P03 GPU report.
 - No large P03 artifact was safe to compress while keeping the source checkout directly reusable. Unrelated large files in `/data/ycfeng/tmp` were not changed because their reuse status is outside this task.
+
+## Cloud transfer completion (2026-09-15)
+
+- Job `exp-0915-140553-008483` passed: 67 verified staged files; 10 image manifests; 69 unique config/layer blobs; 1,452,034,837 blob bytes. Source revision and hashes match the P03 manifest.
+- Actual `nvidia-smi` reported NVIDIA H200. Python backend verified personal creator, local NFS source, and `succeeded` terminal state. Reports and the completion marker were written under the personal cloud root.
+- First P04 job `exp-0915-140853-974340` failed during startup. The first platform log query returned zero rows; the cause is under inspection. No successful provider rollout is claimed.

@@ -1,0 +1,711 @@
+{
+  "cloud_root": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3",
+  "started_at": 1789452564.2380419,
+  "gpu": "GPU 0: NVIDIA H200 (UUID: GPU-4fc67367-340d-7083-b7b4-eb92b28a5ef8)",
+  "files": [
+    {
+      "source": "terminal-bench-d28711d0da2675d0bb1d56de45ae5df6082438a3.tar.gz",
+      "destination": "sources/terminal-bench-d28711d0da2675d0bb1d56de45ae5df6082438a3.tar.gz",
+      "size": 131852463,
+      "sha256": "2bdc450e4aeaa95829f673c9eeb9aa5586f902ff7175a7e6a0321845f3943d4f",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/sources/terminal-bench-d28711d0da2675d0bb1d56de45ae5df6082438a3.tar.gz",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/builds/wasm-pipeline/Dockerfile",
+      "destination": "evidence/p03/builds/wasm-pipeline/Dockerfile",
+      "size": 22464,
+      "sha256": "d654a328fe1a518c054c2d6915c14d7c4d369724a05fcec046c2a1f635fd77f8",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/builds/wasm-pipeline/Dockerfile",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/builds/wasm-pipeline/build.json",
+      "destination": "evidence/p03/builds/wasm-pipeline/build.json",
+      "size": 23521,
+      "sha256": "2c194b8779c77285725acb8447eaeba4fa776e43aea02b32a8596b7b427475e0",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/builds/wasm-pipeline/build.json",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/wasm-pipeline.json",
+      "destination": "evidence/p03/verifiers/wasm-pipeline.json",
+      "size": 820,
+      "sha256": "e874867ce770a963e48d52c8495bf2800fc8402363351026fb759bc5071e911b",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/wasm-pipeline.json",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/wasm-pipeline.solution.log",
+      "destination": "evidence/p03/verifiers/wasm-pipeline.solution.log",
+      "size": 3353,
+      "sha256": "8dbfb066a33c23de5bbe13828553e4b49ea4856a75dd7f4d329f4bac70c93743",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/wasm-pipeline.solution.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/wasm-pipeline.verifier.log",
+      "destination": "evidence/p03/verifiers/wasm-pipeline.verifier.log",
+      "size": 4289,
+      "sha256": "18ecc917eec7c7cfe426252c1cfae3434131e2fda9b99af746e1396184d92c93",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/wasm-pipeline.verifier.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/wasm-pipeline.nvidia-smi.log",
+      "destination": "evidence/p03/verifiers/wasm-pipeline.nvidia-smi.log",
+      "size": 45,
+      "sha256": "9447077862bf91a1dda02382c0b587f79a99638e33f6b7f59a64b5070819ca16",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/wasm-pipeline.nvidia-smi.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/builds/polyglot-c-py/Dockerfile",
+      "destination": "evidence/p03/builds/polyglot-c-py/Dockerfile",
+      "size": 1195,
+      "sha256": "d57d823019e85be3ff59ca5cd11a505341137741b394e527ea9e5b38cc0c1ff4",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/builds/polyglot-c-py/Dockerfile",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/builds/polyglot-c-py/build.json",
+      "destination": "evidence/p03/builds/polyglot-c-py/build.json",
+      "size": 2088,
+      "sha256": "c504e43447de4a5144178c5c16a6b4c914692bae7bf91879add09f85f2dfb235",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/builds/polyglot-c-py/build.json",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/polyglot-c-py.json",
+      "destination": "evidence/p03/verifiers/polyglot-c-py.json",
+      "size": 813,
+      "sha256": "0812925c5cf010fff949e5e737e4af66f707b4cdb2b404db52011a441307bc42",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/polyglot-c-py.json",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/polyglot-c-py.solution.log",
+      "destination": "evidence/p03/verifiers/polyglot-c-py.solution.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/polyglot-c-py.solution.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/polyglot-c-py.verifier.log",
+      "destination": "evidence/p03/verifiers/polyglot-c-py.verifier.log",
+      "size": 4843,
+      "sha256": "3db3b1fad4fd4fe7b54b765d1c35ed5f657e5be4ae2218d2459a1841549a0ac6",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/polyglot-c-py.verifier.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/polyglot-c-py.nvidia-smi.log",
+      "destination": "evidence/p03/verifiers/polyglot-c-py.nvidia-smi.log",
+      "size": 45,
+      "sha256": "9447077862bf91a1dda02382c0b587f79a99638e33f6b7f59a64b5070819ca16",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/polyglot-c-py.nvidia-smi.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/builds/extract-elf/Dockerfile",
+      "destination": "evidence/p03/builds/extract-elf/Dockerfile",
+      "size": 784,
+      "sha256": "e104f58271494886a60cb323d7cb4ff1f961dde83dce2f2f60cb4f5bdb95666c",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/builds/extract-elf/Dockerfile",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/builds/extract-elf/build.json",
+      "destination": "evidence/p03/builds/extract-elf/build.json",
+      "size": 1704,
+      "sha256": "ba3aad27a27478feeb707d08e2dc94462a9c08e1287023042eca76a8ba2d7511",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/builds/extract-elf/build.json",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/extract-elf.json",
+      "destination": "evidence/p03/verifiers/extract-elf.json",
+      "size": 806,
+      "sha256": "0533b2291321be581e5024adcc756cade1959f9a80aa93815d58f710f28dea16",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/extract-elf.json",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/extract-elf.solution.log",
+      "destination": "evidence/p03/verifiers/extract-elf.solution.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/extract-elf.solution.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/extract-elf.verifier.log",
+      "destination": "evidence/p03/verifiers/extract-elf.verifier.log",
+      "size": 3735,
+      "sha256": "38a18bcd1d1dbc4273f16fdd1280ed50bcdaff2879e271d0a1810abf21fa719b",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/extract-elf.verifier.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/extract-elf.nvidia-smi.log",
+      "destination": "evidence/p03/verifiers/extract-elf.nvidia-smi.log",
+      "size": 45,
+      "sha256": "9447077862bf91a1dda02382c0b587f79a99638e33f6b7f59a64b5070819ca16",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/extract-elf.nvidia-smi.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/builds/multi-source-data-merger/Dockerfile",
+      "destination": "evidence/p03/builds/multi-source-data-merger/Dockerfile",
+      "size": 6396,
+      "sha256": "e9539b34f788ce8bac15fa39632544f154115a594b4e951e45b2222443d42ac9",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/builds/multi-source-data-merger/Dockerfile",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/builds/multi-source-data-merger/build.json",
+      "destination": "evidence/p03/builds/multi-source-data-merger/build.json",
+      "size": 2687,
+      "sha256": "54c9a7c29d32b78da01de9b7abe9b4d4264acade896debec681c5d9b452c2094",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/builds/multi-source-data-merger/build.json",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/multi-source-data-merger.json",
+      "destination": "evidence/p03/verifiers/multi-source-data-merger.json",
+      "size": 887,
+      "sha256": "06c7af667c6d5e08a40871f63fb8db3739f8a3c56fe1eb376fffd7cc6ce391c9",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/multi-source-data-merger.json",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/multi-source-data-merger.solution.log",
+      "destination": "evidence/p03/verifiers/multi-source-data-merger.solution.log",
+      "size": 347,
+      "sha256": "11cf951f667380808e9bb6630f5a8dad8667618a039febf1736c5c2366748b37",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/multi-source-data-merger.solution.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/multi-source-data-merger.verifier.log",
+      "destination": "evidence/p03/verifiers/multi-source-data-merger.verifier.log",
+      "size": 4294,
+      "sha256": "5110e60b755311747bd9bcc30089d51fecb454242ff32c62c5418622698ad808",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/multi-source-data-merger.verifier.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/multi-source-data-merger.nvidia-smi.log",
+      "destination": "evidence/p03/verifiers/multi-source-data-merger.nvidia-smi.log",
+      "size": 45,
+      "sha256": "9447077862bf91a1dda02382c0b587f79a99638e33f6b7f59a64b5070819ca16",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/multi-source-data-merger.nvidia-smi.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/builds/recover-accuracy-log/Dockerfile",
+      "destination": "evidence/p03/builds/recover-accuracy-log/Dockerfile",
+      "size": 9394,
+      "sha256": "988f9d5521a1f8d3c60d593e20a81cf4dd5972e8b700198390e90c68d0206505",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/builds/recover-accuracy-log/Dockerfile",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/builds/recover-accuracy-log/build.json",
+      "destination": "evidence/p03/builds/recover-accuracy-log/build.json",
+      "size": 2687,
+      "sha256": "54c9a7c29d32b78da01de9b7abe9b4d4264acade896debec681c5d9b452c2094",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/builds/recover-accuracy-log/build.json",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/recover-accuracy-log.json",
+      "destination": "evidence/p03/verifiers/recover-accuracy-log.json",
+      "size": 862,
+      "sha256": "3e403ae817ae25b6f3632ce5e381f6d6c28066586a5065575b4424d9e02f2ea8",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/recover-accuracy-log.json",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/recover-accuracy-log.solution.log",
+      "destination": "evidence/p03/verifiers/recover-accuracy-log.solution.log",
+      "size": 1005,
+      "sha256": "a7de21e5f507fcb136b7e93487f69a76ae7a55d41076bd15039826525a63365c",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/recover-accuracy-log.solution.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/recover-accuracy-log.verifier.log",
+      "destination": "evidence/p03/verifiers/recover-accuracy-log.verifier.log",
+      "size": 3576,
+      "sha256": "d39a63bca9ae36c98bcfd373849f42b86e3c552bd786d750d12366ef7c140529",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/recover-accuracy-log.verifier.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/recover-accuracy-log.nvidia-smi.log",
+      "destination": "evidence/p03/verifiers/recover-accuracy-log.nvidia-smi.log",
+      "size": 45,
+      "sha256": "9447077862bf91a1dda02382c0b587f79a99638e33f6b7f59a64b5070819ca16",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/recover-accuracy-log.nvidia-smi.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/builds/log-summary-date-ranges/Dockerfile",
+      "destination": "evidence/p03/builds/log-summary-date-ranges/Dockerfile",
+      "size": 6758,
+      "sha256": "3f4db79477906394438c896a885a7eb0cf4911e55b47efa5712d7df104f8f3e2",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/builds/log-summary-date-ranges/Dockerfile",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/builds/log-summary-date-ranges/build.json",
+      "destination": "evidence/p03/builds/log-summary-date-ranges/build.json",
+      "size": 7939,
+      "sha256": "886a4d87170cfcc969ffb1effb75fb79bfb8bab1dc6c1fcb97235c7fc470df2c",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/builds/log-summary-date-ranges/build.json",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/log-summary-date-ranges.json",
+      "destination": "evidence/p03/verifiers/log-summary-date-ranges.json",
+      "size": 877,
+      "sha256": "7b8eca844ae4d88e021b529aecf306f77a6e92466dd3e68751442c5eb9165b7b",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/log-summary-date-ranges.json",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/log-summary-date-ranges.solution.log",
+      "destination": "evidence/p03/verifiers/log-summary-date-ranges.solution.log",
+      "size": 1453,
+      "sha256": "27a8f1f3e6c6a9cb8c2e8110e3181a879cbedded24bed978d343daa2e01ed13f",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/log-summary-date-ranges.solution.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/log-summary-date-ranges.verifier.log",
+      "destination": "evidence/p03/verifiers/log-summary-date-ranges.verifier.log",
+      "size": 3728,
+      "sha256": "3369672e99dd265fee1ec037a35eeaaf50774c03eefa07552de9ad236f73e3e3",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/log-summary-date-ranges.verifier.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/log-summary-date-ranges.nvidia-smi.log",
+      "destination": "evidence/p03/verifiers/log-summary-date-ranges.nvidia-smi.log",
+      "size": 45,
+      "sha256": "9447077862bf91a1dda02382c0b587f79a99638e33f6b7f59a64b5070819ca16",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/log-summary-date-ranges.nvidia-smi.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/builds/jq-data-processing/Dockerfile",
+      "destination": "evidence/p03/builds/jq-data-processing/Dockerfile",
+      "size": 3467,
+      "sha256": "a7b66e327b4460b84b698c3ebcb4e53eb1cf639fd6f8312b45b99ca19260ad38",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/builds/jq-data-processing/Dockerfile",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/builds/jq-data-processing/build.json",
+      "destination": "evidence/p03/builds/jq-data-processing/build.json",
+      "size": 2687,
+      "sha256": "54c9a7c29d32b78da01de9b7abe9b4d4264acade896debec681c5d9b452c2094",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/builds/jq-data-processing/build.json",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/jq-data-processing.json",
+      "destination": "evidence/p03/verifiers/jq-data-processing.json",
+      "size": 850,
+      "sha256": "00096d026c4895c7a4fb7b626b6dbf12d295f8e113e3bd1ca479aa0c43197ad0",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/jq-data-processing.json",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/jq-data-processing.solution.log",
+      "destination": "evidence/p03/verifiers/jq-data-processing.solution.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/jq-data-processing.solution.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/jq-data-processing.verifier.log",
+      "destination": "evidence/p03/verifiers/jq-data-processing.verifier.log",
+      "size": 6007,
+      "sha256": "50cc804b1a983898c2dedc8fb4a7272ab0605fcc81f0f797fd77efa150bb34f9",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/jq-data-processing.verifier.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/jq-data-processing.nvidia-smi.log",
+      "destination": "evidence/p03/verifiers/jq-data-processing.nvidia-smi.log",
+      "size": 45,
+      "sha256": "9447077862bf91a1dda02382c0b587f79a99638e33f6b7f59a64b5070819ca16",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/jq-data-processing.nvidia-smi.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/builds/pandas-etl/Dockerfile",
+      "destination": "evidence/p03/builds/pandas-etl/Dockerfile",
+      "size": 2953,
+      "sha256": "86d6ef8c92b566e0d7090e33e0d630dc3427a6097a71b5654fd7cc05e4505e2c",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/builds/pandas-etl/Dockerfile",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/builds/pandas-etl/build.json",
+      "destination": "evidence/p03/builds/pandas-etl/build.json",
+      "size": 2687,
+      "sha256": "54c9a7c29d32b78da01de9b7abe9b4d4264acade896debec681c5d9b452c2094",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/builds/pandas-etl/build.json",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/pandas-etl.json",
+      "destination": "evidence/p03/verifiers/pandas-etl.json",
+      "size": 803,
+      "sha256": "77b1e3c5a1f21a595c05b20a49441ea5985a4624df21215a93784e725feb2fa0",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/pandas-etl.json",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/pandas-etl.solution.log",
+      "destination": "evidence/p03/verifiers/pandas-etl.solution.log",
+      "size": 1120,
+      "sha256": "f05d4c8c84c971bb229a3f28a184ed204fe627053ce206ee5e02c6e7505d0d56",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/pandas-etl.solution.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/pandas-etl.verifier.log",
+      "destination": "evidence/p03/verifiers/pandas-etl.verifier.log",
+      "size": 4540,
+      "sha256": "97715759b55f304a360fac9fc26a7c08c0f56454239f42fab0c1d931c5e12b04",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/pandas-etl.verifier.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/pandas-etl.nvidia-smi.log",
+      "destination": "evidence/p03/verifiers/pandas-etl.nvidia-smi.log",
+      "size": 45,
+      "sha256": "9447077862bf91a1dda02382c0b587f79a99638e33f6b7f59a64b5070819ca16",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/pandas-etl.nvidia-smi.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/builds/jsonl-aggregator/Dockerfile",
+      "destination": "evidence/p03/builds/jsonl-aggregator/Dockerfile",
+      "size": 13105,
+      "sha256": "f0ce3845bef71ccc2c4d9cb6876aeb357e5dae77266db6e49274a8321523aa08",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/builds/jsonl-aggregator/Dockerfile",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/builds/jsonl-aggregator/build.json",
+      "destination": "evidence/p03/builds/jsonl-aggregator/build.json",
+      "size": 14275,
+      "sha256": "8e74fea7c108711e443ced363cda1e7bfa06525552a2213ce48d0d7a2ed01802",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/builds/jsonl-aggregator/build.json",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/jsonl-aggregator.json",
+      "destination": "evidence/p03/verifiers/jsonl-aggregator.json",
+      "size": 835,
+      "sha256": "270fc176d1847773bd4f663ead039270265e2a252af1e3ef89261b951caec244",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/jsonl-aggregator.json",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/jsonl-aggregator.solution.log",
+      "destination": "evidence/p03/verifiers/jsonl-aggregator.solution.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/jsonl-aggregator.solution.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/jsonl-aggregator.verifier.log",
+      "destination": "evidence/p03/verifiers/jsonl-aggregator.verifier.log",
+      "size": 3435,
+      "sha256": "036fd09377456b9a5a0876d66e3f84855e38253fbdef3f694a4094db202554e6",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/jsonl-aggregator.verifier.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/jsonl-aggregator.nvidia-smi.log",
+      "destination": "evidence/p03/verifiers/jsonl-aggregator.nvidia-smi.log",
+      "size": 45,
+      "sha256": "9447077862bf91a1dda02382c0b587f79a99638e33f6b7f59a64b5070819ca16",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/jsonl-aggregator.nvidia-smi.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/builds/gcode-to-text/Dockerfile",
+      "destination": "evidence/p03/builds/gcode-to-text/Dockerfile",
+      "size": 1445,
+      "sha256": "28ee838a0665a6ad8ada1ad1ea2958038ad941a90c5ffd659c598e7c3de215c8",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/builds/gcode-to-text/Dockerfile",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/builds/gcode-to-text/build.json",
+      "destination": "evidence/p03/builds/gcode-to-text/build.json",
+      "size": 2460,
+      "sha256": "e9d347898bd71acf03fbfdfb72b2f009730ab22ea79c17fe2173d06ccb44b55f",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/builds/gcode-to-text/build.json",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/gcode-to-text.json",
+      "destination": "evidence/p03/verifiers/gcode-to-text.json",
+      "size": 818,
+      "sha256": "54788b4329b6a7afd8cfd7fc8fb04d470e2807734c67217a98620d7c2074742b",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/gcode-to-text.json",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/gcode-to-text.solution.log",
+      "destination": "evidence/p03/verifiers/gcode-to-text.solution.log",
+      "size": 6451,
+      "sha256": "ac7932adcb6e9123b9f55e66ed061834e2f507c6a1c769ef24ee509a65b86e60",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/gcode-to-text.solution.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/gcode-to-text.verifier.log",
+      "destination": "evidence/p03/verifiers/gcode-to-text.verifier.log",
+      "size": 3371,
+      "sha256": "fabd9bc7ea8c4f7b0eb0992815573a92c083ca21b650645e256ba26fe4719e36",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/gcode-to-text.verifier.log",
+      "verified": true
+    },
+    {
+      "source": "payload/evidence/p03/verifiers/gcode-to-text.nvidia-smi.log",
+      "destination": "evidence/p03/verifiers/gcode-to-text.nvidia-smi.log",
+      "size": 45,
+      "sha256": "9447077862bf91a1dda02382c0b587f79a99638e33f6b7f59a64b5070819ca16",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/evidence/p03/verifiers/gcode-to-text.nvidia-smi.log",
+      "verified": true
+    },
+    {
+      "source": "payload/manifests/rejoin_w1_candidate_manifest.jsonl",
+      "destination": "manifests/rejoin_w1_candidate_manifest.jsonl",
+      "size": 37739,
+      "sha256": "0cdb695b8537c852d89804dd0255509ee0aec7dbda7c22f1f5e2838df4838104",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/manifests/rejoin_w1_candidate_manifest.jsonl",
+      "verified": true
+    },
+    {
+      "source": "payload/manifests/rejoin_w1_cohort_selection.md",
+      "destination": "manifests/rejoin_w1_cohort_selection.md",
+      "size": 7331,
+      "sha256": "5dadb9f3eaace561316fa38099e158712f1677f6f22b3b21f9221ce2feececd9",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/manifests/rejoin_w1_cohort_selection.md",
+      "verified": true
+    },
+    {
+      "source": "payload/manifests/cloud_storage.md",
+      "destination": "manifests/cloud_storage.md",
+      "size": 2093,
+      "sha256": "46252527f25b6df4d5bb113029564cadc2ab766b3231f5d1fc2854e9db720d30",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/manifests/cloud_storage.md",
+      "verified": true
+    },
+    {
+      "source": "payload/manifests/runtime_digests.json",
+      "destination": "manifests/runtime_digests.json",
+      "size": 3398,
+      "sha256": "d5190ad7394d083f5f0ee6b66735de8db17faa7f6eef9c79fea80f5bc98b673d",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/manifests/runtime_digests.json",
+      "verified": true
+    },
+    {
+      "source": "payload/reports/provider_preflight.json",
+      "destination": "reports/provider_preflight.json",
+      "size": 1491,
+      "sha256": "f441245c57b21b07e48c4458937a7a12979032aee5f2a5fc30523aea3444b764",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/reports/provider_preflight.json",
+      "verified": true
+    },
+    {
+      "source": "payload/code/rejoin-code-p04-preparation.tar.gz",
+      "destination": "code/rejoin-code-p04-preparation.tar.gz",
+      "size": 12101,
+      "sha256": "ea468d9fc8e9036cac74beb86d7f18c3d2d3e331bc9d3ee2b3b5a3da046d4590",
+      "cloud_path": "/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/code/rejoin-code-p04-preparation.tar.gz",
+      "verified": true
+    }
+  ],
+  "images": [
+    {
+      "task_id": "wasm-pipeline",
+      "image_tag": "terminal-bench-wasm-pipeline-rejoin-v3-d28711d0da26-v3",
+      "image_digest": "sha256:a57a8486a3a2b0082dbf3dd98c96262c699253e587b9a95865c141ffd8a54faa",
+      "source_revision": "d28711d0da2675d0bb1d56de45ae5df6082438a3",
+      "verified": true,
+      "layer_count": 14,
+      "oci_reference": "oci:/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/images/oci:wasm-pipeline"
+    },
+    {
+      "task_id": "polyglot-c-py",
+      "image_tag": "terminal-bench-polyglot-c-py-rejoin-v3-d28711d",
+      "image_digest": "sha256:8055ca32d2f789a904dc541dfd738b2c3ddc299eaec16e6560db18645abc30fc",
+      "source_revision": "d28711d0da2675d0bb1d56de45ae5df6082438a3",
+      "verified": true,
+      "layer_count": 9,
+      "oci_reference": "oci:/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/images/oci:polyglot-c-py"
+    },
+    {
+      "task_id": "extract-elf",
+      "image_tag": "terminal-bench-extract-elf-rejoin-v3-d28711d0da26",
+      "image_digest": "sha256:9695e51af59a1f1355825eb1707ee0ac9e33f14c9fd930300befda8029bb6e0f",
+      "source_revision": "d28711d0da2675d0bb1d56de45ae5df6082438a3",
+      "verified": true,
+      "layer_count": 12,
+      "oci_reference": "oci:/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/images/oci:extract-elf"
+    },
+    {
+      "task_id": "multi-source-data-merger",
+      "image_tag": "terminal-bench-multi-source-data-merger-rejoin-v3-d28711d0da26-v2",
+      "image_digest": "sha256:11122a8a51c97ad466ba793c98d04d620db6b80ac6dfc667e3f3e28bdcd3dc40",
+      "source_revision": "d28711d0da2675d0bb1d56de45ae5df6082438a3",
+      "verified": true,
+      "layer_count": 10,
+      "oci_reference": "oci:/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/images/oci:multi-source-data-merger"
+    },
+    {
+      "task_id": "recover-accuracy-log",
+      "image_tag": "terminal-bench-recover-accuracy-log-rejoin-v3-d28711d0da26-v2",
+      "image_digest": "sha256:cff1441dc2937aa431d57a43fc343dd30e1e5efe9d30937156984424f78c9c97",
+      "source_revision": "d28711d0da2675d0bb1d56de45ae5df6082438a3",
+      "verified": true,
+      "layer_count": 12,
+      "oci_reference": "oci:/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/images/oci:recover-accuracy-log"
+    },
+    {
+      "task_id": "log-summary-date-ranges",
+      "image_tag": "terminal-bench-log-summary-date-ranges-rejoin-v3-d28711d0da26",
+      "image_digest": "sha256:2c33f28e0da5e281dea2aecd246f9d5a7200225eb3d8d702a5eaa8677a94cf1f",
+      "source_revision": "d28711d0da2675d0bb1d56de45ae5df6082438a3",
+      "verified": true,
+      "layer_count": 12,
+      "oci_reference": "oci:/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/images/oci:log-summary-date-ranges"
+    },
+    {
+      "task_id": "jq-data-processing",
+      "image_tag": "terminal-bench-jq-data-processing-rejoin-v3-d28711d0da26-v2",
+      "image_digest": "sha256:c35deeaf65d00112283ff15e37d6c767cf38c3ccebc3bd5cf591147806dd4881",
+      "source_revision": "d28711d0da2675d0bb1d56de45ae5df6082438a3",
+      "verified": true,
+      "layer_count": 12,
+      "oci_reference": "oci:/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/images/oci:jq-data-processing"
+    },
+    {
+      "task_id": "pandas-etl",
+      "image_tag": "terminal-bench-pandas-etl-rejoin-v3-d28711d0da26-v2",
+      "image_digest": "sha256:52451b768b01905639f18fbac53d030ebf16419741522641e2cc797298bda94b",
+      "source_revision": "d28711d0da2675d0bb1d56de45ae5df6082438a3",
+      "verified": true,
+      "layer_count": 11,
+      "oci_reference": "oci:/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/images/oci:pandas-etl"
+    },
+    {
+      "task_id": "jsonl-aggregator",
+      "image_tag": "terminal-bench-jsonl-aggregator-rejoin-v3-d28711d0da26",
+      "image_digest": "sha256:03beb2d2cf4d7c566f5208782e04e5c3e0806be042a6936d4b1085d7a4257bad",
+      "source_revision": "d28711d0da2675d0bb1d56de45ae5df6082438a3",
+      "verified": true,
+      "layer_count": 12,
+      "oci_reference": "oci:/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/images/oci:jsonl-aggregator"
+    },
+    {
+      "task_id": "gcode-to-text",
+      "image_tag": "terminal-bench-gcode-to-text-rejoin-v3-d28711d0da26-v8",
+      "image_digest": "sha256:5cb7f47842c3f83e3299f720f1abe10a0f08a6076e90c6e7379a9621202d7e65",
+      "source_revision": "d28711d0da2675d0bb1d56de45ae5df6082438a3",
+      "verified": true,
+      "layer_count": 12,
+      "oci_reference": "oci:/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/images/oci:gcode-to-text"
+    }
+  ],
+  "source_revision": "d28711d0da2675d0bb1d56de45ae5df6082438a3",
+  "status": "PASS",
+  "finished_at": 1789452606.4348564,
+  "blob_count": 69,
+  "blob_bytes": 1452034837,
+  "blobs": {
+    "sha256:ef43eabd5fc2b5f1fc39947b666f27486733ef10352fa6efea0feb23984251a8": 26708,
+    "sha256:ac0c285abb482df6684de5a61b4577fc5cc5fafe8cd1280ebf52d8909d121599": 30586640,
+    "sha256:223a2b62fbb2ddc678fb3c84fa074cb26f83b652b76a9c7205b7700ad0186d95": 15008657,
+    "sha256:cf5e8da83b6000191f8710def1e696f2c9229d23a6142952efb2bdf48c0aa1fe": 91,
+    "sha256:22ca86546652b03abe326a417fe2136dcbc4872441d03c176f87b4feb36a6b05": 8587288,
+    "sha256:5a6bdad529aa537210c8678469d15a3e276f56c215e0955783f3eccd4bb56b0c": 17744548,
+    "sha256:17df445e1d4f6578d3d48fc302ebfa06f8e5cb27f1b290ec1ad0c780f34e1843": 18026991,
+    "sha256:48fc621336753701a686e4f5717d19f06a5e4326da2f0380cefeda0c7d8bd441": 259,
+    "sha256:8eb0a29878464c6a7e5183be39d3f12021d99f7e1a8d9e1a2f21d493ddba9e0e": 155454669,
+    "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1": 32,
+    "sha256:aa119f7bb2c22f446850fa0918cdbebb5d9e9c76dafddbaecdba8858496aed14": 165476425,
+    "sha256:53b772d97193e6d56b1b126c900b13d25168ad825ddfd1451d14db350fddd975": 319,
+    "sha256:c0e74eff575199a297da2b0c981cb7d34e8209e1a3c3b6bd35cf1d80fedb1e6c": 238,
+    "sha256:00d33c1a2df2e5b84a559dd544ba5fa15d8dcc2ebd0042e6fa8a4d13178f2eae": 207,
+    "sha256:d60953d95c678d7dc8bae46632397e945359871998a8a3bafb4415d212633874": 1754,
+    "sha256:fec02d2294b70b904efff1a02bb4a6ee532bcdb7c13f2fe7d78167d750a7f17a": 4521,
+    "sha256:88c877a3d54e0f647f26d4a178fcc0a8bb7d4f95ecc66ca7c6062c469e1a7f73": 123802037,
+    "sha256:05b4c915050aa267f3f39ae399707399f9c5d7081a36db45851f513e0b4b3656": 5292,
+    "sha256:a7a9720394c879741831dc7d26fbdcfc95df90633af674b53f966b4d9cc81e20": 316788747,
+    "sha256:ffdfb1935ea692d527ef27e9a849aff86b57f1772c080fb74d86de1dc41e54a6": 192,
+    "sha256:a6ec806661fe5fbd85789f9fd0fecf1abc4996facf03209e43bd593d62b12970": 2313,
+    "sha256:03a447b27183fdf580ba4f93eea38b8b0ebe28267973166be1048ceae5c8f142": 13214,
+    "sha256:6310eb16bf4251731feab01e8f633bf5e2d75a657ccad97f420b1f83cce457be": 29792658,
+    "sha256:3678bb828654fcc3752f7a5eb63c5accfa00c97047252f25405285550d74a3fd": 4265327,
+    "sha256:db840d086b65cf73e0feea3bd0cf11063818114e466846ae3f2b2fb1a8c2b143": 14450967,
+    "sha256:f9efa1b83d065a7c5a3041582875b75d63c4ab3d4413514de8e413b51f90e91a": 249,
+    "sha256:71b68a47d554aff09dec27626628a1c95a71cacf0002d64b6c5ee7d9f129c764": 18955190,
+    "sha256:63405eb7360affde787e66e5a2467f6f6497c2f1fd93385b6a213e96660c9e27": 110840289,
+    "sha256:a0d69db5443203679c83ea0c8724ae1e7f4847a1501a8336f68978c069e71115": 93,
+    "sha256:5896a2559decf3faeff24be7c10e6612c6ee97610d69a8860bbc84b0c878ea74": 287,
+    "sha256:d9282c1a264699fdd3e6169a04c7f851966b32845543e9cbaa627f8ae500c267": 248,
+    "sha256:3a4ed845da38e958d0fc3fbb508be99b9ba31067c925a19934049481bf1a6e60": 1678,
+    "sha256:2450c58fd51786ca59fe24003060ae9477a329dd466142b36b739aced2c945b4": 14851,
+    "sha256:486dbf987c66d381e55da2fe0fceb473435899121e907eda1dce553ba15bb88f": 29125138,
+    "sha256:31fc40b7245b1b5a9c87e53d8a533c3f8bcd41cc4510e92a14a0f41828e77d45": 3511491,
+    "sha256:b20e3a1a6b0d346f72ea74fcff4ac580894cd2c53b4876161d1f7fea56affce8": 12583838,
+    "sha256:e81d26d6c5a732f0cff33c82eea14a6cbfa7b497ce0f65b5df2151430b34c33c": 249,
+    "sha256:9a459d467f9a8890675e9a458f492ae843be088969c1e40b8bb2e7221b43f9e2": 13351589,
+    "sha256:0a636c415da476f4cba82188fd035589c64eba8bf8dd6e522d45c8020d6c95e3": 93,
+    "sha256:eb79f550c39e04b579c0c4733e1405fa7744fab5da64f5468a052fb533fcea01": 1564807,
+    "sha256:5f3f11d9ca1a95a1c31c545e3c4d849b028643d0ad44b3c5254a32c665eec92a": 23479469,
+    "sha256:95f78f70fd91d636b50b5660e45f30c8512f7e5f158f58b9da3e74bae378c125": 530,
+    "sha256:1422f60544fd1c7794bea55fba00968689afdefe1a39a380be94691fcb7d1feb": 489,
+    "sha256:e48e610739991ddaa00122c5a8a85875abf5ebf2f951f157076a64264f7618cd": 122,
+    "sha256:0014df312e6249d98056f1b42ab51480652d467873d95e57aecb08cd5cc97e26": 10434,
+    "sha256:4da9fb906b30e64a49e0ebc28f06d8cf55caece25f00e48ab309dbb03caf482a": 1764,
+    "sha256:227d2fbe3166ebf035599ab0dcb853c0a953e449b85b114db024c6f4270592fc": 655575,
+    "sha256:91e424efbfbd4ab1f024320bd5c40b02a70bf9259cd6e53da76ab8b927e3193f": 151,
+    "sha256:04a8c77512b4e6d915c471f6bb909b17f3ba393bfe546450d990593282617972": 10165,
+    "sha256:658ddc5ea6e9b07c7994176e2c627780da2656b20fedf652351ae419c8a7f9e9": 2628855,
+    "sha256:62a7207b7834ed3affe6a90b05cd0ed42b7cd908c400fb04036f7160315bf222": 9434759,
+    "sha256:60908387136a76e67ff5fea04c17d65ec16876e34d4f512c8538e381900bb928": 20895596,
+    "sha256:56c8691418d249307afbdc5a41c2c3b7e8a4d339f8a6df92f50b66f249bc87fb": 1074,
+    "sha256:eaa8eec25e8ae4f50213a0eec0131e286031c51a4663b3e0dceba462a34e053f": 15361,
+    "sha256:0e2004565ae1300bfc7197e0c796e826719bd8b2eee1f42e67d195fd5748ff80": 6432,
+    "sha256:d218b4d8c331b70686a23abc185ed080b67ae4bbd0e52ba47824d1a76246ecf5": 38039733,
+    "sha256:e70d55a877f44900878f617fdd78f83f10e98bba59fea782441e26961bddb1ad": 798,
+    "sha256:22603a2a1e6f669e6581b6ec6142c9b6883c00489c190a1c097fc462094aac9c": 830,
+    "sha256:5de4632ecd0b3d593d70cae9955e994742a65158f459538610824a1bd9e7b311": 16681,
+    "sha256:355387db8c584b8d67c98e91d7eeb4202a4f0adfee004e21a88c5aff80b19a84": 2659,
+    "sha256:7e199f2aaa975d3769f926c020d9ac6ba7b7639f1b90eeec8601726b7b48ebfe": 13014399,
+    "sha256:d85d3b26b3571ca40f3d25b9a887817dd8a37add6575ace8671794c310f52edd": 141,
+    "sha256:f95ec942445690762079b75c86dc3f03a8ba979ed8dedef3209dcc9288a05e5f": 9170,
+    "sha256:09e068e25701854438d0cc402f58a1c91dbd82004aab72f996714941398a5786": 1036258,
+    "sha256:6f995c7ee83909a0df91e26430083a38c09a21b0c963c31efd35cab41090e1ec": 346,
+    "sha256:72a23999e8d6a8ffcc900be6b2fd4a6b1dcf590eb212b85ec59f08a9a42590c8": 110091715,
+    "sha256:06b8d8c6502628296e03c63ffe7c243336ef3992013e49955b018807b1d76ff8": 141819199,
+    "sha256:13b9857d14be6605baf681db09da71698033a72ab91d76a17cac679d8bd4e1ac": 433509,
+    "sha256:43dab4cc6454376fc0314fa66c2f427d9f6f8399684f9476be135f7f2a35a857": 438439
+  }
+}

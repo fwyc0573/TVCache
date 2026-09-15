@@ -5,6 +5,7 @@
 | 2026-09-13 | Created task record for converting the v3 ReJoin research plan into durable planning documents. |
 | 2026-09-13 | Follow-up request authorized execution of the recorded plan, starting at P00 and continuing through the ready packets. |
 | 2026-09-15 | Recorded the CPU-master Docker limitation and the approved GPU-worker build and verifier route for P03. |
+| 2026-09-15 | Added cloud persistence and authorized P04 smoke when existing resources settle required inputs. |
 
 # Requirements
 
@@ -36,6 +37,11 @@
 - The four P04 smoke tasks are ready to run; no provider rollout has started yet.
 
 ## Acceptance Criteria
+
+- [Original Request] 将需要复用的 task/image/rollout 等持久化保存到云卷 ycfeng 目录下，为当前任务建立分类目录；运行生成的大型持久产物也写入该目录。
+- [Original Request] 调查 P04 是否仍有必须由用户提供的数据或关键决策；有则列出讨论，没有则直接执行 P04 smoke。
+- Cloud writes use StepMind Python RJobBackend with the declared JuiceFS mount, only below `/mnt/codesign-exp/ycfeng`. Worker caches stay on temporary local storage. Upload source, complete image data, and selected evidence; exclude credentials.
+- P04 uses the four recorded tasks with four independent rollouts each, fixed provider settings, real tools, persisted traces, workspace artifacts, and verifier results. Existing provider resources should be checked before requesting new information.
 
 - The new task directory is present under `task_memory/`.
 - The source plan is analyzed into structured findings with goals, exclusions, evidence classes, workloads, metrics, gates, risks, and open decisions.

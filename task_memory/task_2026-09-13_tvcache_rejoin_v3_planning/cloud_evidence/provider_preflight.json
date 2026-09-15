@@ -1,0 +1,52 @@
+{
+  "status": 200,
+  "elapsed_s": 1.2713022232055664,
+  "request": {
+    "model": "deepseek-v4-flash",
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "seed": 20260915,
+    "max_tokens": 1024,
+    "response_format": {
+      "type": "json_object"
+    },
+    "tool_choice": "none",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Return exactly this JSON object: {\"tool\":\"read_file\",\"arguments\":{\"path\":\"input.txt\"},\"final_answer\":null}"
+      }
+    ]
+  },
+  "response": {
+    "choices": [
+      {
+        "message": {
+          "content": "{\"tool\":\"read_file\",\"arguments\":{\"path\":\"input.txt\"},\"final_answer\":null}",
+          "reasoning_content": "We need to return exactly the JSON object as specified. The user said \"Return exactly this JSON object: ...\". So we just output that JSON string. No additional text.",
+          "role": "assistant"
+        },
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null
+      }
+    ],
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 29,
+      "completion_tokens": 55,
+      "total_tokens": 84,
+      "completion_tokens_details": {
+        "reasoning_tokens": 35
+      },
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "created": 1789451343,
+    "system_fingerprint": null,
+    "model": "deepseek-v4-flash",
+    "id": "chatcmpl-4d53cbe2-4086-9ba9-a1b7-ed20afa01424"
+  },
+  "base_url": "https://models-proxy.stepfun-inc.com"
+}

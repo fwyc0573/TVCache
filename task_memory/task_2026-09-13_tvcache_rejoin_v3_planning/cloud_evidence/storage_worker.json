@@ -1,0 +1,29 @@
+{
+  "job": "exp-0915-140553-008483",
+  "creator": "i-fengyicheng",
+  "image": "hub.i.basemind.com/stepmind/megatron-step:test-optimus-3.24.0-stepccl-0.0.5.post5-vllm-0.11.0.post37-20260817-2733176",
+  "mounts": {
+    "default": "100.96.128.193:/data/ycfeng/tmp/rejoin-p04-control:/data/ycfeng/tmp/rejoin-p04-control"
+  },
+  "worker_status": "succeeded",
+  "platform_status": {
+    "phase": "Succeeded",
+    "reason": "RJobSucceeded",
+    "message": "RJob succeeded",
+    "taskStatuses": {
+      "default": {
+        "succeeded": 1,
+        "taskStage": "stepmind-task-stage-1"
+      }
+    },
+    "finishTime": "2026-09-15T06:10:08Z",
+    "taskStage": "stepmind-task-stage-1"
+  },
+  "quota": "step_main",
+  "gpu": "H200",
+  "command": [
+    "bash",
+    "-lc",
+    "python3 /data/ycfeng/tmp/rejoin-p04-control/rejoin_cloud.py --config /data/ycfeng/tmp/rejoin-p04-control/storage_config.json --report /data/ycfeng/tmp/rejoin-p04-control/storage_worker_report.json"
+  ]
+}
