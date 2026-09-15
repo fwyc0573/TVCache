@@ -50,3 +50,9 @@ All ten selected tasks have successful build metadata, registry manifest digests
 - **Observed:** nine v18 rollouts ended with `ValueError: Provider native tool arguments are invalid`. The provider response ended in an unterminated JSON string while generating the contents of a long `write_file` call. The short native calls and the same task images completed normally.
 - **Evidence:** v18 inspection records show `/app/merge_users.py` and `/app/process.py` ending mid-content at the 1024-token response budget. A direct probe using the same endpoint and native-call settings returned parseable calls for 3.5K, 5.5K, and 7.5K character contents with a 2048-token request; no endpoint or image failure was observed.
 - **Resolution:** P04 configs now request 4096 output tokens. Malformed-call retries request 4096 and then 3072 tokens. The assistant native message, including `reasoning_content`, remains in the next request, and `parallel_tool_calls=false` remains enabled.
+
+## P04 provider transient HTTP failures
+
+- **Status:** observed in v20; retry fix prepared for v21.
+- **Observed:** `polyglot-c-py/r1` and `recover-accuracy-log/r3` received HTTP 503 after valid native calls and workspace mutations. The collector wrote complete workspace/verifier artifacts but marked the rollout as `collection_error`.
+- **Resolution:** `collect_p04.py` now repeats the identical request up to three times for HTTP 429, 500, 502, 503, and 504, and for URL/timeouts, with 1-second then 2-second backoff. Non-transient HTTP responses still fail immediately. The smoke must be rerun with this collector because its no-collection-error check is strict.

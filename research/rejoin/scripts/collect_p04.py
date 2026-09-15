@@ -131,9 +131,23 @@ def complete(config: dict, key: str, messages: list, output: Path, index: int) -
         stem = f"{index:03d}" if attempt == 0 else f"{index:03d}.retry{attempt}"
         write_json(output / "provider" / f"{stem}.request.json",
                    {"request_id": request_id, "start_epoch_ns": started, "payload": payload})
-        with urllib.request.urlopen(request, timeout=180) as response:
-            body = json.load(response)
-            status = response.status
+        # The provider can briefly return 429/5xx while a long rollout is
+        # active. Retry the same request before treating it as a collection
+        # failure; the action history and request id stay unchanged.
+        for network_attempt in range(3):
+            try:
+                with urllib.request.urlopen(request, timeout=180) as response:
+                    body = json.load(response)
+                    status = response.status
+                break
+            except urllib.error.HTTPError as error:
+                if error.code not in (429, 500, 502, 503, 504) or network_attempt == 2:
+                    raise
+                time.sleep(2 ** network_attempt)
+            except (urllib.error.URLError, TimeoutError):
+                if network_attempt == 2:
+                    raise
+                time.sleep(2 ** network_attempt)
         ended = time.time_ns()
         write_json(output / "provider" / f"{stem}.response.json", body)
         choice = body["choices"][0]

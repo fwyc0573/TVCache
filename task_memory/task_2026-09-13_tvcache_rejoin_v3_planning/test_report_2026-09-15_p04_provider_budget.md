@@ -3,6 +3,7 @@
 | Date | Summary of Changes |
 | --- | --- |
 | 2026-09-15 | Recorded provider budget probe and v19 preparation checks. |
+| 2026-09-15 | Added transient HTTP retry verification after v20 provider 503 observations. |
 
 # P04 provider budget probe
 
@@ -38,3 +39,5 @@
 The 1024-token v18 failures are separate evidence: their raw arguments ended mid-string and were rejected by `json.loads`. The probe demonstrates provider parsing capacity for representative long calls; it does not prove that every task trajectory will finish within 4096 tokens. The new smoke run is the required end-to-end check.
 
 The code checks passed: Python compilation succeeded, the eight-tool test file reported `3 passed`, and v19 preparation reported `P04_PREPARED 16` with every config field verified.
+
+The v20 execution exposed two HTTP 503 responses after valid native actions. The collector change uses three attempts for HTTP 429/5xx and URL/timeouts, with 1-second and 2-second delays; this path will be verified by the next full smoke run.

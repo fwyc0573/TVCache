@@ -14,6 +14,7 @@
 | 2026-09-15 | Completed P03 runtime preparation on H200: built ten final images, captured registry digests, ran all ten verifiers, and confirmed the eight-tool surface. |
 | 2026-09-15 | Recorded P04 collection preparation, cloud persistence, and current execution evidence. |
 | 2026-09-15 | Investigated v18 native-call truncation, compared provider budgets, updated P04 to a 4096-token primary budget with 4096/3072 retries, and prepared v19 configs. |
+| 2026-09-15 | Ran v20 on H200/step_main; long native writes completed, but two late provider HTTP 503 responses became collection errors. Added transient HTTP retries for the next run. |
 
 # Status: in-progress (P04 provider smoke is pending)
 
@@ -156,6 +157,15 @@ P03 is complete. P04 may start with the four verified smoke tasks. A provider en
 - A direct provider probe used the same endpoint, model, native function format, `thinking={"type":"disabled"}`, and `parallel_tool_calls=false`. Requests for 3.5K, 5.5K, and 7.5K character contents produced parseable native calls at 2048, 4096, and 8192 requested tokens; the returned completion stopped below the limit when the call was complete. The earlier 1024-token limit therefore left no room for the longer task scripts.
 - Updated `tests/e2e/run_rejoin_p04.py` to emit `max_tokens=4096` and policy `p04-v19-native-tools-4k-cleanup`. Updated `research/rejoin/scripts/collect_p04.py` malformed-call retries to 4096 and 3072.
 - Generated all 16 v19 configs under `/data/ycfeng/tmp/rejoin-p04-control/` and verified their policy and budget fields. No GPU job has been submitted for v19 yet.
+
+## P04 v20 execution checkpoint (2026-09-15)
+
+- v20 was submitted by a detached local launcher so its lifetime is independent of a conversation turn. The first 4 jobs were verified as `Running`, creator `i-fengyicheng`, H200, `step_main`, and local NFS source `100.96.128.194:/data/ycfeng/tmp/rejoin-p04-control`.
+- `wasm-pipeline`: 4/4 final, 3 verifier passes, no collection errors.
+- `multi-source-data-merger`: 4/4 final, 4 verifier passes, no collection errors. This confirms the 4096-token policy handles its long `write_file` action.
+- `polyglot-c-py`: r1 ended after 51 calls with provider HTTP 503; r2 and some other rollouts reached final, while r0 was still active at this checkpoint.
+- `recover-accuracy-log`: all four rollouts wrote final artifacts, but all verifier exits were 1; r3 also ended on provider HTTP 503 after two calls. These failures are recorded outcomes and do not indicate an image or GPU startup issue.
+- Updated `collect_p04.py` to retry the same request up to three times for HTTP 429 and 5xx responses. A new full 16-rollout run is required because the smoke check rejects collection errors.
 
 ## FIFO queue recheck (2026-09-15)
 

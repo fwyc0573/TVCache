@@ -4,6 +4,7 @@
 | --- | --- |
 | 2026-09-15 | Recorded the provider, collection policy, execution environment, and smoke checks. |
 | 2026-09-15 | Switched P04 to native function calls and raised the long-action token budget after v18 truncation evidence. |
+| 2026-09-15 | Added retries for transient provider HTTP 429 and 5xx responses after v20 observed two 503 collection errors. |
 
 # P04 provider smoke
 
@@ -30,7 +31,7 @@ Tools run through the existing seven S0 plus one S1 implementation. Timing cover
 
 After the actor stops, the unchanged upstream `tests/test_outputs.py` and its fixtures are copied into the disposable filesystem. The collector runs the same pytest target as `run-tests.sh`, using CPU-prepared pytest 8.4.1 and the image's task dependencies. This avoids repeating the shell script's system/package installation. P03 already validated that shell setup and reference solution. Verifier status is separate from collection status; a task failure is a recorded outcome.
 
-The v18 run used a 1024-token native-call limit. Its long `write_file` responses ended in incomplete JSON strings: `multi-source-data-merger` stopped while writing `/app/merge_users.py`, and `recover-accuracy-log` stopped while writing `/app/process.py`. A direct provider probe with `thinking={"type":"disabled"}` showed complete parseable calls for requested 3.5K, 5.5K, and 7.5K character contents under a 2048-token request; 4096 is retained as the operational ceiling for actual code generation and retries. The v19 run records this policy in each config.
+The v18 run used a 1024-token native-call limit. Its long `write_file` responses ended in incomplete JSON strings: `multi-source-data-merger` stopped while writing `/app/merge_users.py`, and `recover-accuracy-log` stopped while writing `/app/process.py`. A direct provider probe with `thinking={"type":"disabled"}` showed complete parseable calls for requested 3.5K, 5.5K, and 7.5K character contents under a 2048-token request; 4096 is retained as the operational ceiling for actual code generation and retries. The v19 config records this policy. The v20 run also saw two HTTP 503 collection errors after long trajectories, so the next collector retries 429, 500, 502, 503, and 504 three times with short backoff.
 
 Smoke checks:
 
