@@ -117,10 +117,21 @@ def complete(config: dict, key: str, messages: list, output: Path, index: int) -
             "seed_support": "accepted; deterministic behavior not established",
             "usage": body.get("usage"), "finish_reason": choice.get("finish_reason"),
             "start_epoch_ns": started, "end_epoch_ns": ended, "http_status": status}
-    append_json(output / "provider.jsonl", meta)
     if choice.get("finish_reason") != "stop":
         raise ValueError(f"Provider finish reason: {choice.get('finish_reason')}")
-    action = json.loads(choice["message"]["content"])
+    content = choice["message"].get("content")
+    if not isinstance(content, str):
+        raise ValueError("Provider message content must be a string")
+    parsed = json.loads(content)
+    content_shape = "object"
+    if isinstance(parsed, list) and len(parsed) == 1 and isinstance(parsed[0], dict):
+        # Some compatible endpoints wrap a single requested action in an array.
+        # Preserve the wire-shape evidence while accepting the unambiguous action.
+        parsed = parsed[0]
+        content_shape = "singleton_array_unwrapped"
+    meta["content_shape"] = content_shape
+    append_json(output / "provider.jsonl", meta)
+    action = parsed
     if not isinstance(action, dict):
         raise ValueError("Provider action must be a JSON object")
     return action, meta
