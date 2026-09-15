@@ -148,3 +148,7 @@ P03 is complete. P04 may start with the four verified smoke tasks. A provider en
 - Waiting commands/logs are under `/data/ycfeng/tmp/rejoin-p04-control/`: `p04-second-launch.log`, `p04-continuation.log`, and per-rollout launcher/collector logs. Detailed commands and the passing CPU checks are in `test_report_2026-09-15_p04_preparation.md`.
 - No completed real rollout or smoke PASS is claimed at this checkpoint. Required user data and unresolved user design decisions: none. Open execution issue: H200 quota; the task-image NVIDIA library correction awaits this worker.
 - User clarified platform behavior: `predict-only` quota=0 is not a submission gate. The queued job must remain submitted through StepMind Python `RJobBackend` so the platform can run it FIFO after quota release. Added this rule to the worker skill and authoritative StepMind runbook; current P04 job remains queued and is being inspected by exact name.
+
+## FIFO queue recheck (2026-09-15)
+
+- Exact-job inspection still reports `exp-0915-141415-207218` as `Pending` / `RJob is queuing` in `step-main-default`; platform message remains `Insufficient GPU quota`, `H200=0`. This is an accepted queued state under the clarified rule. The first launcher and continuation controller remain alive; no duplicate job was submitted.
