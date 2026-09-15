@@ -154,8 +154,10 @@ def complete(config: dict, key: str, messages: list, output: Path, index: int) -
                 raise ValueError("Provider native tool arguments are invalid") from error
             if not isinstance(arguments, dict) or not isinstance(function.get("name"), str):
                 raise ValueError("Provider native tool call is malformed")
+            native_message = dict(message)
+            native_message.setdefault("reasoning_content", "")
             meta.update(response_mode="native_tool_call", native_tool_call=call,
-                        native_assistant_message=message, content_shape="native_tool_call")
+                        native_assistant_message=native_message, content_shape="native_tool_call")
             append_json(output / "provider.jsonl", meta)
             return {"tool": function["name"], "arguments": arguments, "final_answer": None}, meta
         if choice.get("finish_reason") != "stop":
