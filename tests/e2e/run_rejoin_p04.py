@@ -48,9 +48,11 @@ def prepare(stage: Path, run_id: str) -> list[Path]:
                 "run_id": run_id, "rollout_id": f"r{index}", "task": row,
                 "base_url": "https://models-proxy.stepfun-inc.com", "model": "deepseek-v4-flash",
                 "sampling": {"temperature": 0.8, "top_p": 0.95, "seed": 20260915 + index},
-                "max_tokens": 1024, "max_steps": 96, "thinking": {"type": "disabled"},
+                # Long native write_file arguments need room for the escaped file
+                # content.  The v18 1024-token budget cut those arguments mid-string.
+                "max_tokens": 4096, "max_steps": 96, "thinking": {"type": "disabled"},
                 "native_tools": True,
-                "policy": "p04-v11-native-tools-1k-cleanup",
+                "policy": "p04-v19-native-tools-4k-cleanup",
             }
             path = stage / f"{run_id}.{row['task_id']}.r{index}.json"
             path.write_text(json.dumps(config, indent=2) + "\n")

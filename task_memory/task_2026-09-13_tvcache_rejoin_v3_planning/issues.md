@@ -43,3 +43,10 @@ All ten selected tasks have successful build metadata, registry manifest digests
 - Task images do not set NVIDIA binary/library search paths. The first storage job failed with missing `nvidia-smi`; a full handbook worker image completed cloud persistence. The first P04 job then found the binary but exited 12. The P04 wrapper now supplies `/usr/local/nvidia/bin` and `/usr/local/nvidia/lib64` plus `/usr/local/nvidia/lib`. Verification is pending the fresh worker.
 - Platform Python logs for the first P04 job returned zero rows. The runbook-authorized SSH read recovered the exact traceback; future collector logs are written directly to the local mounted task staging directory.
 - Job `exp-0915-141415-207218` is queued: `Insufficient GPU quota`, queue `step-main-default`, `H200=0`. Keep the local launcher alive and inspect the existing job. No additional provider or task input is missing.
+
+## P04 native long-action truncation
+
+- **Status:** v18 cause identified; v19 policy prepared and awaiting a fresh smoke run.
+- **Observed:** nine v18 rollouts ended with `ValueError: Provider native tool arguments are invalid`. The provider response ended in an unterminated JSON string while generating the contents of a long `write_file` call. The short native calls and the same task images completed normally.
+- **Evidence:** v18 inspection records show `/app/merge_users.py` and `/app/process.py` ending mid-content at the 1024-token response budget. A direct probe using the same endpoint and native-call settings returned parseable calls for 3.5K, 5.5K, and 7.5K character contents with a 2048-token request; no endpoint or image failure was observed.
+- **Resolution:** P04 configs now request 4096 output tokens. Malformed-call retries request 4096 and then 3072 tokens. The assistant native message, including `reasoning_content`, remains in the next request, and `parallel_tool_calls=false` remains enabled.

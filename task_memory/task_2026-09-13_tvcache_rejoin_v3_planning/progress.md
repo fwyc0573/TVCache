@@ -13,6 +13,7 @@
 | 2026-09-13 | Follow-up execution started. P00 baseline completed with the Basemind mirror after public PyPI `hatchling` resolution timed out; P01 B01 reproducer and evidence commit completed. |
 | 2026-09-15 | Completed P03 runtime preparation on H200: built ten final images, captured registry digests, ran all ten verifiers, and confirmed the eight-tool surface. |
 | 2026-09-15 | Recorded P04 collection preparation, cloud persistence, and current execution evidence. |
+| 2026-09-15 | Investigated v18 native-call truncation, compared provider budgets, updated P04 to a 4096-token primary budget with 4096/3072 retries, and prepared v19 configs. |
 
 # Status: in-progress (P04 provider smoke is pending)
 
@@ -148,6 +149,13 @@ P03 is complete. P04 may start with the four verified smoke tasks. A provider en
 - Waiting commands/logs are under `/data/ycfeng/tmp/rejoin-p04-control/`: `p04-second-launch.log`, `p04-continuation.log`, and per-rollout launcher/collector logs. Detailed commands and the passing CPU checks are in `test_report_2026-09-15_p04_preparation.md`.
 - No completed real rollout or smoke PASS is claimed at this checkpoint. Required user data and unresolved user design decisions: none. Open execution issue: H200 quota; the task-image NVIDIA library correction awaits this worker.
 - User clarified platform behavior: `predict-only` quota=0 is not a submission gate. The queued job must remain submitted through StepMind Python `RJobBackend` so the platform can run it FIFO after quota release. Added this rule to the worker skill and authoritative StepMind runbook; current P04 job remains queued and is being inspected by exact name.
+
+## P04 v18 truncation investigation and v19 preparation (2026-09-15)
+
+- Read the complete local inspection output for the nine v18 collection errors. The failures occur when `write_file` arguments contain multi-line Python source; the raw argument ends mid-string and `json.loads` raises `JSONDecodeError`.
+- A direct provider probe used the same endpoint, model, native function format, `thinking={"type":"disabled"}`, and `parallel_tool_calls=false`. Requests for 3.5K, 5.5K, and 7.5K character contents produced parseable native calls at 2048, 4096, and 8192 requested tokens; the returned completion stopped below the limit when the call was complete. The earlier 1024-token limit therefore left no room for the longer task scripts.
+- Updated `tests/e2e/run_rejoin_p04.py` to emit `max_tokens=4096` and policy `p04-v19-native-tools-4k-cleanup`. Updated `research/rejoin/scripts/collect_p04.py` malformed-call retries to 4096 and 3072.
+- Generated all 16 v19 configs under `/data/ycfeng/tmp/rejoin-p04-control/` and verified their policy and budget fields. No GPU job has been submitted for v19 yet.
 
 ## FIFO queue recheck (2026-09-15)
 

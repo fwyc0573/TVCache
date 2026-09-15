@@ -116,7 +116,9 @@ def complete(config: dict, key: str, messages: list, output: Path, index: int) -
                           "include reasoning or prose.")
             request_messages = [*messages, {"role": "user", "content": retry_text}]
             payload["messages"] = request_messages
-            retry_budget = (1024 if native_tools else 384) if attempt == 1 else (768 if native_tools else 256)
+            # Keep malformed long write_file calls recoverable.  A 1K retry budget
+            # was smaller than the file argument that caused the original failure.
+            retry_budget = (4096 if native_tools else 384) if attempt == 1 else (3072 if native_tools else 256)
             payload["max_tokens"] = min(config["max_tokens"], retry_budget)
             payload["temperature"] = 0.0
             payload["top_p"] = 1.0

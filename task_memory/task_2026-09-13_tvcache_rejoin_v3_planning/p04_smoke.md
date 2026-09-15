@@ -3,6 +3,7 @@
 | Date | Summary of Changes |
 | --- | --- |
 | 2026-09-15 | Recorded the provider, collection policy, execution environment, and smoke checks. |
+| 2026-09-15 | Switched P04 to native function calls and raised the long-action token budget after v18 truncation evidence. |
 
 # P04 provider smoke
 
@@ -16,8 +17,8 @@ Required user inputs: none. The existing authorized StepCode configuration passe
 | Model | `deepseek-v4-flash` |
 | Sampling | temperature 0.8, top_p 0.95, seed 20260915 + rollout index |
 | Seed behavior | Request accepted; deterministic replay has not been established |
-| Response | One JSON action per turn; json_object; tool_choice none |
-| Limits | 32 tool steps; 8192 output tokens per request; 120 seconds per exec |
+| Response | Native function call per turn; `parallel_tool_calls=false`; assistant `reasoning_content` is retained in the next request |
+| Limits | 96 tool steps; 4096 output tokens per request; malformed-call retries use 4096 then 3072; 120 seconds per exec |
 | GPU allocation | H200, step_main, local personal Python RJobBackend |
 | Storage | `cloud_storage.md` defines the shared root and folders |
 
@@ -28,6 +29,8 @@ The collector copies the task image runtime into temporary worker storage. The a
 Tools run through the existing seven S0 plus one S1 implementation. Timing covers execution inside the tool process; manifests and provider requests have separate timing records. Full provider responses, tool observations, before/after workspace manifests, and final workspace archives are written under the cloud rollout directory. Temporary files and compiler/package caches stay on worker storage.
 
 After the actor stops, the unchanged upstream `tests/test_outputs.py` and its fixtures are copied into the disposable filesystem. The collector runs the same pytest target as `run-tests.sh`, using CPU-prepared pytest 8.4.1 and the image's task dependencies. This avoids repeating the shell script's system/package installation. P03 already validated that shell setup and reference solution. Verifier status is separate from collection status; a task failure is a recorded outcome.
+
+The v18 run used a 1024-token native-call limit. Its long `write_file` responses ended in incomplete JSON strings: `multi-source-data-merger` stopped while writing `/app/merge_users.py`, and `recover-accuracy-log` stopped while writing `/app/process.py`. A direct provider probe with `thinking={"type":"disabled"}` showed complete parseable calls for requested 3.5K, 5.5K, and 7.5K character contents under a 2048-token request; 4096 is retained as the operational ceiling for actual code generation and retries. The v19 run records this policy in each config.
 
 Smoke checks:
 
