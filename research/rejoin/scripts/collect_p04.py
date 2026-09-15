@@ -96,10 +96,9 @@ def complete(config: dict, key: str, messages: list, output: Path, index: int) -
         request_id = uuid4().hex
         request_messages = messages
         payload = {"model": config["model"], "messages": request_messages,
-                   **config["sampling"], "max_tokens": config["max_tokens"],
-                   "response_format": {"type": "json_object"}, "tool_choice": "none",
-                   "thinking": config.get("thinking", {"type": "disabled"}),
-                   "reasoning_effort": config.get("reasoning_effort", "low")}
+               **config["sampling"], "max_tokens": config["max_tokens"],
+               "response_format": {"type": "json_object"}, "tool_choice": "none",
+               "thinking": config.get("thinking", {"type": "disabled"})}
         if attempt:
             request_messages = [*messages, {"role": "user", "content":
                 "The previous response was truncated. Return one short JSON object "
