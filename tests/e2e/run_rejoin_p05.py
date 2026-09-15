@@ -30,6 +30,11 @@ def prepare(stage: Path, run_id: str) -> list[Path]:
     shutil.copyfile(MANIFEST, public / "manifest.jsonl")
     shutil.copytree(REPO / "tests/e2e", public / "e2e", dirs_exist_ok=True,
                     ignore=shutil.ignore_patterns("__pycache__", ".pytest_cache"))
+    verifier_packages = Path("/data/ycfeng/tmp/rejoin-p04-control/public/verifier_packages")
+    if not verifier_packages.is_dir():
+        raise FileNotFoundError(f"Reusable verifier package tree is missing: {verifier_packages}")
+    shutil.copytree(verifier_packages, public / "verifier_packages", dirs_exist_ok=True,
+                    ignore=shutil.ignore_patterns("__pycache__", ".pytest_cache"))
     key = json.loads(Path("/data/ycfeng/tmp/stepcode-config-i-fengyicheng.json").read_text())["apiKey"]
     secret = private / "provider.json"
     secret.touch(mode=0o600, exist_ok=True)

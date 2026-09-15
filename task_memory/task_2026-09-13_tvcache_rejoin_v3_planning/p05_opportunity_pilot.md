@@ -63,4 +63,4 @@ The P06 continuation heuristic is recorded without changing class rules: C+U aro
 
 ## Current status
 
-Preparation is complete: the phase-aware collector, ten-task runner, P05 aggregate checker, and analyzer pass local syntax checks and a 40-config prepare-only run. No P05 provider rollout or opportunity result is claimed yet.
+Preparation is complete: the phase-aware collector, ten-task runner, P05 aggregate checker, and analyzer pass local syntax checks and a 40-config prepare-only run. The first launcher attempt (`p05-20260915-v1`) exposed a missing copied `verifier_packages` directory after four workers had entered the tool loop; those logs are retained as a staging failure. The runner now copies the verified offline package tree and the next attempt uses a fresh run id. No P05 opportunity result is claimed yet.

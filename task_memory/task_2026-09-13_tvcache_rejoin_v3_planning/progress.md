@@ -17,6 +17,7 @@
 | 2026-09-15 | Ran v20 on H200/step_main; long native writes completed, but two late provider HTTP 503 responses became collection errors. Added transient HTTP retries for the next run. |
 | 2026-09-15 | Completed P04 v21 on H200/step_main: the collection gate passed for all 16 rollouts with zero collection errors. |
 | 2026-09-15 | Started P05: added phase-aware collection, ten-task runner, 40-rollout aggregate checker, opportunity analyzer, and P05 preparation record. |
+| 2026-09-15 | Aborted the first P05 launcher after all started workers exposed a missing verifier-package staging path; retained logs and fixed the runner to copy the verified package tree before the next run. |
 
 # Status: P05 in progress (P04 provider smoke PASS; collection and analysis pending)
 
@@ -29,6 +30,12 @@
 - Added `research/rejoin/scripts/analyze_p05.py` for A/B/C/U/N hindsight and completed-donor online views, time weighting, mutation-depth and support-class summaries, figures O1–O3, and at most ten serial reference attempts.
 - Local checks: all new Python files parse and compile; a 40-config prepare-only run returned `P05_PREPARED 40`; a synthetic trace classified the intended post-divergence S0 match as C. The worker chroot smoke helper was not run on CPU because it explicitly requires sudo; P04 already supplied the corresponding worker evidence.
 - No P05 GPU rollout or opportunity result is claimed yet. Next action: create the P05 cloud menu, submit the local StepMind Python `RJobBackend` launcher, and retain its exact job names and queue state.
+
+### P05 v1 staging failure (2026-09-15)
+
+- Four initial rollouts entered the real tool loop and produced provider/tool logs, but verifier setup failed with `FileNotFoundError: .../public/verifier_packages` because the new stage did not copy the reusable offline package tree.
+- The failure is a collector staging defect, not a provider, image, GPU, mount, or cloud persistence failure. The active launcher was interrupted before submitting the remaining batch; its four submitted jobs were stopped by the Python backend on process exit.
+- The failed run id is retained as `p05-20260915-v1` evidence. The next run uses a fresh id and copies `/data/ycfeng/tmp/rejoin-p04-control/public/verifier_packages` into the stage before submission.
 
 ## Cloud persistence and P04 continuation (2026-09-15)
 
