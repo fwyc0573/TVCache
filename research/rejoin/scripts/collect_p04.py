@@ -244,7 +244,10 @@ def collect(config: dict, config_dir: Path, report_path: Path) -> None:
     if not root.is_relative_to("/mnt/codesign-exp/ycfeng"):
         raise ValueError("Cloud output must be inside the personal directory")
     row = config["task"]
-    output = root / "rollouts/p04" / config["run_id"] / row["task_id"] / config["rollout_id"]
+    phase = config.get("phase", "p04")
+    if phase not in {"p04", "p05"}:
+        raise ValueError(f"Unsupported collection phase: {phase}")
+    output = root / "rollouts" / phase / config["run_id"] / row["task_id"] / config["rollout_id"]
     output.mkdir(parents=True, exist_ok=False)
     (output / "provider").mkdir()
     write_json(output / "config.json", config)
@@ -398,11 +401,16 @@ def collect(config: dict, config_dir: Path, report_path: Path) -> None:
     write_json(report_path, summary)
     report_path.chmod(0o666)
     print("ROLLOUT_COMPLETE", json.dumps(summary), flush=True)
-    completed = list((root / "rollouts/p04" / config["run_id"]).glob("*/r*/COMPLETE.json"))
-    if len(completed) == 16:
-        subprocess.run([sys.executable, str(SCRIPT_ROOT / "scripts/check_p04.py"),
-                        "--cloud-root", str(root), "--run-id", config["run_id"],
-                        "--report", str(config_dir / (config["run_id"] + ".smoke.json"))], check=True)
+    expected_rollouts = config.get("expected_rollouts", 16 if phase == "p04" else None)
+    check_script = config.get("check_script", "check_p04.py" if phase == "p04" else None)
+    completed = list((root / "rollouts" / phase / config["run_id"]).glob("*/r*/COMPLETE.json"))
+    if expected_rollouts and check_script and len(completed) == expected_rollouts:
+        check_command = [sys.executable, str(SCRIPT_ROOT / "scripts" / check_script),
+                         "--cloud-root", str(root), "--run-id", config["run_id"],
+                         "--report", str(config_dir / (config["run_id"] + ".aggregate.json"))]
+        if config.get("manifest_path"):
+            check_command.extend(["--manifest", config["manifest_path"]])
+        subprocess.run(check_command, check=True)
     if summary["termination"] == "collection_error":
         raise SystemExit(1)
 

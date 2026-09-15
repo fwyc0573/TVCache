@@ -17,6 +17,7 @@ def main() -> None:
     parser.add_argument('--image', required=True)
     parser.add_argument('--source', type=Path, required=True)
     parser.add_argument('--report', type=Path, required=True)
+    parser.add_argument('--exp-id', default='rejoin-p04')
     parser.add_argument('command', nargs=argparse.REMAINDER)
     args = parser.parse_args()
     if not args.source.resolve().is_relative_to('/data/ycfeng') or not args.command:
@@ -25,7 +26,7 @@ def main() -> None:
     os.environ['BRAINPP_ACCESS_KEY'] = (credentials / 'accesskey_id').read_text().strip()
     os.environ['BRAINPP_SECRET_KEY'] = (credentials / 'accesskey_secret').read_text().strip()
     os.environ['STEPMIND_BACKEND'] = 'rjob'
-    os.environ['EXP_ID'] = 'rejoin-p04'
+    os.environ['EXP_ID'] = args.exp_id
     os.environ['PYTHONDONTWRITEBYTECODE'] = '1'
     sys.path.insert(0, '/data/ycfeng/steptron')
     from steptron.exp.base_exp import ResourceConfig

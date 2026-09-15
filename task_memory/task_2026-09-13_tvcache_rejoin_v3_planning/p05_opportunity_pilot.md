@@ -1,0 +1,66 @@
+## Modification History
+
+| Date       | Summary of Changes |
+| ---------- | ------------------ |
+| 2026-09-15 | Started P05 opportunity-pilot preparation after the P04 v21 smoke gate passed. |
+
+# P05 Opportunity Pilot
+
+## Goal
+
+Measure repeated tool work across the ten verified W1 tasks and decide whether the evidence supports a guarded ReJoin mechanism study. P05 is an observation and analysis stage. It does not add cache behavior to TVCache.
+
+## Collection
+
+- Cohort: the ten included rows in `rejoin_w1_candidate_manifest.jsonl` at source revision `d28711d0da2675d0bb1d56de45ae5df6082438a3`.
+- Rollouts: four independent provider trajectories per task, 40 total.
+- Provider: `https://models-proxy.stepfun-inc.com`, model `deepseek-v4-flash`, native tools, `max_tokens=4096`, `max_steps=96`, `parallel_tool_calls=false`.
+- Resource route: local StepMind Python `RJobBackend`, `H200`, `step_main`, local source mount, personal creator `i-fengyicheng`.
+- Cloud layout:
+
+  ```text
+  /mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/
+    rollouts/p05/<run-id>/<task-id>/<rollout-id>/
+    reports/p05/<run-id>/
+    code/p05/<run-id>/
+  ```
+
+- Collection concurrency is recorded in the run command and report. Worker temporary files stay under `/data/ycfeng/tmp`; trace, workspace archive, verifier artifacts, and reports are written to the cloud root.
+
+## Class rules
+
+Each event is matched only with events from another rollout of the same task and the same tool plus normalized arguments.
+
+- **A:** same invocation prefix and same workspace-before digest. This is existing stateful prefix/history reuse and is reported separately.
+- **B:** different invocation history but same workspace-before digest and same observed result/effect. This is a full-state opportunity and is not the main post-divergence claim.
+- **C:** S0 invocation after both donor and recipient have different prior mutations, with the same observed result/effect and a remaining recipient state difference. This is the primary safe opportunity candidate.
+- **U:** repeated S1 invocation after prior divergence without a complete dependency and effect description. It is a potential opportunity only.
+- **N:** no matching donor satisfies the applicable rule.
+
+The analyzer produces two views. Hindsight permits any donor in the completed batch. The completed-donor online view keeps only donors whose event end time precedes the recipient event start time. A post-divergence match requires non-empty and different prior mutation histories on donor and recipient.
+
+## Analysis and evidence
+
+The event cost is `end_ns - start_ns`. The analyzer writes:
+
+- `opportunity_pilot.md` and `opportunity_pilot.json`;
+- per-task call/time/verifier tables;
+- Figure O1, class time share;
+- Figure O2, C/U opportunity by prior mutation depth;
+- Figure O3, repeated signature concentration;
+- a list of the ten most expensive repeated signatures and small serial reference rerun results.
+
+The P06 continuation heuristic is recorded without changing class rules: C+U around 10% of observed tool time, post-divergence evidence in at least three tasks, and top-1 signature below around 60%.
+
+## Acceptance checks
+
+1. 40/40 rollout records, traces, provider metadata, workspace manifests, archives, and verifier artifacts reload.
+2. Collection errors are zero or are reported with their exact task and rollout; no silent retry or record removal is allowed.
+3. A/B/C/U/N class counts and time totals sum to all observed tool calls and time in each view.
+4. Hindsight and completed-donor online views are both present.
+5. Top repeated signatures are explicit, and serial reference attempts are limited to ten.
+6. The report answers all eight P05 questions and states what the data cannot establish.
+
+## Current status
+
+Preparation is complete: the phase-aware collector, ten-task runner, P05 aggregate checker, and analyzer pass local syntax checks and a 40-config prepare-only run. No P05 provider rollout or opportunity result is claimed yet.

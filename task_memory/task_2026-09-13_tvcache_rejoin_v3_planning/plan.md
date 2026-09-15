@@ -5,12 +5,13 @@
 | 2026-09-13 | Landed the v3 execution plan as ordered packets with gates, artifacts, and verification rules. |
 | 2026-09-15 | Closed P03 after GPU-worker image builds, registry digest capture, verifier execution, and tool-surface checks. |
 | 2026-09-15 | Recorded P04 collection preparation, cloud persistence, and current execution evidence. |
+| 2026-09-15 | Closed P04 v21 smoke and started P05 opportunity-pilot preparation. |
 
 # ReJoin v3 Execution Plan
 
 ## Current status
 
-The user has authorized execution. P00, P01, P02, and P03 are complete; P04 is in progress with the verified StepCode provider and cloud storage. The source of truth remains `draft-plan/TVCache_ReJoin_Codex_Plan_v3_ZH.md`, originally pinned at `43cf9d6a779eb5149e0fae50b9a3a891dcbaed6f`; the current checkout includes the execution evidence commits.
+The user has authorized execution. P00, P01, P02, P03, and P04 are complete; P05 is in progress with the verified provider, ten-task cohort, and cloud storage. The source of truth remains `draft-plan/TVCache_ReJoin_Codex_Plan_v3_ZH.md`, originally pinned at `43cf9d6a779eb5149e0fae50b9a3a891dcbaed6f`; the current checkout includes the execution evidence commits.
 
 ## Execution status
 
@@ -20,8 +21,8 @@ The user has authorized execution. P00, P01, P02, and P03 are complete; P04 is i
 | P01 cursor issue lock | complete | B01 strict `xfail`, forced failure evidence, and `issues.md`; commits `cce8520`, `30ff78f`. |
 | P02 minimal research harness | complete | `research/rejoin/` package, direct execution support, JSONL trace, manifest analysis, and smoke evidence are complete. |
 | P03 cohort/tool surface | complete | Ten W1 images were built through StepBPS, registry digests were captured, all ten verifiers passed on H200, and the eight-tool surface passed direct checks. |
-| P04 API rollout collector | in-progress | Provider preflight and cloud transfer passed; the first real rollout is under execution. |
-| P05 opportunity pilot | pending | Depends on P04 smoke gate. |
+| P04 API rollout collector | complete | `p04-20260915-v21`: 16/16 traces reload, 412 calls, zero collection errors, smoke gate PASS. |
+| P05 opportunity pilot | in-progress | Ten-task runner, phase-specific collector, aggregate checker, and analyzer prepared; 40-rollout collection is next. |
 | P06 decision | pending | Depends on P05 analysis. |
 
 ## Dependency map
