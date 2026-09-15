@@ -44,6 +44,14 @@
 - Root cause for the 413 case was oversized tool-result context sent back to the provider. Added a configurable `max_tool_result_chars=12000` context bound while retaining the complete result in the trace.
 - Fresh v3 retries succeeded for `jsonl-aggregator/r0-r3` and `log-summary-date-ranges/r2`; all five have complete trace, workspace, provider, and verifier artifacts. A run map will combine these five v3 records with the 35 valid v2 records for the final P05 check and analysis.
 
+### P05 merged analysis (2026-09-15)
+
+- Analysis job `exp-0915-222550-684805` completed on H200/step_main and wrote the merged cloud checker report. The checker is PASS: 40/40 records reload, 667 calls, real mutations, both S0/S1 classes, trajectory divergence for all ten tasks, and zero collection errors. A later analysis-only rerun `exp-0915-223247-819216` corrected task-scoped repeated-signature concentration before the final report.
+- Final report: `/mnt/codesign-exp/ycfeng/tvcache-rejoin/task_2026-09-13_v3/reports/p05/p05-20260915-v2/opportunity_pilot.md`; JSON and figures are beside it. Local review copies are under `/data/ycfeng/tmp/rejoin-p05-control-v3/result-v2/`.
+- Hindsight time totals: A 65 calls/0.174 s; B 38 calls/2.295 s; C 45 calls/0.008 s; U 57 calls/2.398 s; N 462 calls/61.957 s. C+U is 3.60% of 66.831 s. Completed-donor online C+U is 1.81%.
+- Eight of ten tasks show post-divergence C or U. The common prior mutation depth is 2. Task-scoped top-1 repeated signature is 7.95%, below the concentration warning level. Opportunity time is almost entirely raw S1 `exec`: 2.398 s U versus 0.008 s C.
+- The P06 heuristic does not support a generic C memoizer (`C+U < 10%`, and C time is negligible). The useful continuation is a Redirect: design one typed adapter for the highest-value U family, the repeated `multi-source-data-merger` S1 `exec` family (1.650 s U time), then reassess before P07. This is a route recommendation, not proof that the adapter is safe.
+
 ## Cloud persistence and P04 continuation (2026-09-15)
 
 - User authorized cloud persistence below `ycfeng` and automatic P04 execution if available resources settle the required inputs.

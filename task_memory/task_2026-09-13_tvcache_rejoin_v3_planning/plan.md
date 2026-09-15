@@ -6,6 +6,7 @@
 | 2026-09-15 | Closed P03 after GPU-worker image builds, registry digest capture, verifier execution, and tool-surface checks. |
 | 2026-09-15 | Recorded P04 collection preparation, cloud persistence, and current execution evidence. |
 | 2026-09-15 | Closed P04 v21 smoke and started P05 opportunity-pilot preparation. |
+| 2026-09-15 | Completed P05 merged opportunity analysis; P06 is ready for a typed U-family redirect decision. |
 
 # ReJoin v3 Execution Plan
 
@@ -22,7 +23,7 @@ The user has authorized execution. P00, P01, P02, P03, and P04 are complete; P05
 | P02 minimal research harness | complete | `research/rejoin/` package, direct execution support, JSONL trace, manifest analysis, and smoke evidence are complete. |
 | P03 cohort/tool surface | complete | Ten W1 images were built through StepBPS, registry digests were captured, all ten verifiers passed on H200, and the eight-tool surface passed direct checks. |
 | P04 API rollout collector | complete | `p04-20260915-v21`: 16/16 traces reload, 412 calls, zero collection errors, smoke gate PASS. |
-| P05 opportunity pilot | in-progress | Ten-task runner, phase-specific collector, aggregate checker, and analyzer prepared; 40-rollout collection is next. |
+| P05 opportunity pilot | complete | Merged v2/v3 collection: 40/40 reload, 667 calls, 0 collection errors; A/B/C/U/N report and O1–O3 figures are in cloud `reports/p05/p05-20260915-v2/`. |
 | P06 decision | pending | Depends on P05 analysis. |
 
 ## Dependency map
